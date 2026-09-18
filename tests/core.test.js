@@ -3,7 +3,10 @@ const assert = require('node:assert/strict');
 const {
   calculateBookingFee,
   bookingConflicts,
-  defaultScenes
+  defaultScenes,
+  isBookingScheduleChanged,
+  isValidBookingStatus,
+  bookingNeedsConflictCheck
 } = require('../cloudfunctions/bookingApi/lib/core');
 
 test('calculates weekday base fee and deposit', () => {
@@ -96,6 +99,66 @@ test('rejects rentals shorter than two hours', () => {
 
   assert.equal(result.ok, false);
   assert.match(result.errors.join(','), /2 小时起租/);
+});
+
+test('rejects impossible calendar dates instead of normalizing them', () => {
+  const result = calculateBookingFee({
+    scene_id: 'study',
+    date: '2026-02-30',
+    start_time: '10:00',
+    end_time: '12:00',
+    people_count: 2
+  });
+
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join(','), /日期/);
+});
+
+test('rejects numeric times outside one calendar day', () => {
+  const result = calculateBookingFee({
+    scene_id: 'study',
+    date: '2026-07-22',
+    start_time: 1440,
+    end_time: 1680,
+    people_count: 2
+  });
+
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join(','), /时间/);
+});
+
+test('only schedule changes count as reschedules', () => {
+  const current = {
+    scene_id: 'study',
+    date: '2026-07-22',
+    start_time: '10:00',
+    end_time: '12:00',
+    people_count: 2
+  };
+
+  assert.equal(isBookingScheduleChanged(current, { ...current, people_count: 4 }), false);
+  assert.equal(isBookingScheduleChanged(current, { ...current, end_time: '12:30' }), true);
+});
+
+test('recognizes only supported booking statuses', () => {
+  assert.equal(isValidBookingStatus('pending'), true);
+  assert.equal(isValidBookingStatus('completed'), true);
+  assert.equal(isValidBookingStatus('paid'), false);
+  assert.equal(isValidBookingStatus(''), false);
+});
+
+test('rechecking a cancelled order is required before reactivation', () => {
+  const cancelled = {
+    status: 'cancelled',
+    scene_id: 'study',
+    date: '2026-07-22',
+    start_time: '10:00',
+    end_time: '12:00'
+  };
+
+  assert.equal(bookingNeedsConflictCheck(cancelled, { status: 'pending' }), true);
+  assert.equal(bookingNeedsConflictCheck(cancelled, { status: 'cancelled' }), false);
+  assert.equal(bookingNeedsConflictCheck({ ...cancelled, status: 'pending' }, { status: 'completed' }), false);
 });
 
 test('blocks real overlap but allows back-to-back bookings', () => {

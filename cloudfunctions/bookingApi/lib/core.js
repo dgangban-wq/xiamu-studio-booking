@@ -8,9 +8,41 @@ const TURNAROUND_REMINDER_MINUTES = 15;
 const OVERTIME_RATE = 30;
 const EXTRA_PERSON_RATE = 50;
 const RESCHEDULE_FEE = 50;
+const BOOKING_STATUSES = new Set(['pending', 'deposit_paid', 'completed', 'cancelled']);
+
+function isValidDateString(date) {
+  if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+  const [year, month, day] = date.split('-').map(Number);
+  if (month < 1 || month > 12 || day < 1) return false;
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return day <= daysInMonth;
+}
+
+function isValidBookingStatus(status) {
+  return BOOKING_STATUSES.has(status);
+}
+
+function isBookingScheduleChanged(current, next) {
+  return ['scene_id', 'date', 'start_time', 'end_time'].some((key) =>
+    next[key] !== undefined && next[key] !== current[key]
+  );
+}
+
+function bookingNeedsConflictCheck(current, next) {
+  const scheduleChanged = isBookingScheduleChanged(current, next);
+  const reactivating = current.status === 'cancelled' &&
+    next.status !== undefined &&
+    next.status !== 'cancelled';
+  return scheduleChanged || reactivating;
+}
 
 function parseTimeToMinutes(time) {
-  if (typeof time === 'number') return time;
+  if (typeof time === 'number') {
+    if (!Number.isInteger(time) || time < 0 || time > 23 * 60 + 59) {
+      throw new Error('时间超出范围');
+    }
+    return time;
+  }
   if (typeof time !== 'string' || !/^\d{2}:\d{2}$/.test(time)) {
     throw new Error('时间格式必须为 HH:mm');
   }
@@ -40,11 +72,20 @@ function normalizeBookingInput(input) {
 }
 
 function validateBookingInput(input) {
-  const normalized = normalizeBookingInput(input);
+  let normalized;
+  try {
+    normalized = normalizeBookingInput(input || {});
+  } catch (error) {
+    return {
+      ok: false,
+      errors: [error.message || '预约时间格式不正确'],
+      value: null
+    };
+  }
   const errors = [];
 
   if (!normalized.scene_id && !normalized.scene_name) errors.push('请选择场景');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized.date || '')) errors.push('请选择预约日期');
+  if (!isValidDateString(normalized.date)) errors.push('请选择有效预约日期');
   if (normalized.end_minutes <= normalized.start_minutes) errors.push('结束时间必须晚于开始时间');
   if (normalized.duration_minutes < MIN_DURATION) errors.push('单场租用必须 2 小时起租');
   if (normalized.start_minutes % SLOT_STEP !== 0 || normalized.end_minutes % SLOT_STEP !== 0) {
@@ -62,6 +103,7 @@ function validateBookingInput(input) {
 }
 
 function getChinaDay(date) {
+  if (!isValidDateString(date)) throw new Error('日期格式不正确');
   const parsed = new Date(`${date}T00:00:00+08:00`);
   if (Number.isNaN(parsed.getTime())) throw new Error('日期格式不正确');
   return parsed.getUTCDay();
@@ -208,7 +250,12 @@ module.exports = {
   OVERTIME_RATE,
   EXTRA_PERSON_RATE,
   RESCHEDULE_FEE,
+  BOOKING_STATUSES,
   defaultScenes,
+  isValidDateString,
+  isValidBookingStatus,
+  isBookingScheduleChanged,
+  bookingNeedsConflictCheck,
   parseTimeToMinutes,
   minutesToTime,
   normalizeBookingInput,

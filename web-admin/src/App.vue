@@ -18,13 +18,20 @@ const statusText: Record<BookingStatus, string> = {
   cancelled: '已取消'
 };
 
+function localDateISO(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const scenes = ref<Scene[]>([]);
 const bookings = ref<Booking[]>([]);
 const loading = ref(false);
 const error = ref('');
 const notice = ref('');
 const filters = reactive({
-  date: new Date().toISOString().slice(0, 10),
+  date: localDateISO(),
   scene_id: '',
   status: '' as BookingStatus | '',
   keyword: ''

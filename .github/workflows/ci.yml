@@ -1,0 +1,33 @@
+name: Verify Xiamu Studio
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web-admin/package-lock.json
+      - name: Run core and offline tests
+        run: node --test tests/*.test.js
+      - name: Install Android wrapper dependencies
+        run: npm ci --prefix android-app
+      - name: Sync Android web assets
+        run: npm run sync:web --prefix android-app
+      - name: Install Web admin dependencies
+        run: npm ci --prefix web-admin
+      - name: Build Web admin
+        run: npm run build --prefix web-admin

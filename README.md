@@ -15,7 +15,7 @@
 2. 修改 `miniprogram/utils/config.js` 中的 `envId`。
 3. 修改 `web-admin/.env.example` 为 `.env.local`，填写同一个云开发环境 ID。
 4. 上传并部署云函数 `bookingApi`。
-5. 在云数据库中创建集合：`scenes`、`bookings`、`holidays`、`admins`。
+5. 在云数据库中创建集合：`scenes`、`bookings`、`holidays`、`admins`。系统会使用 `booking_locks` 记录同场景同日期的并发预约锁，若控制台要求预先建集合，请一并创建。
 6. 运行云函数 action `seedDefaults` 初始化场景数据，或手动导入 `cloudfunctions/bookingApi/data/defaultData.js` 里的场景。
 
 ## 云函数 actions
@@ -47,6 +47,8 @@ npm.cmd test
 
 本项目已经初始化 Git，并准备好了公开上传所需的忽略规则。签名密钥、密码配置、Android SDK、构建缓存和依赖目录不会上传。
 
+安卓 release 构建需要工作室自己的签名密钥。公开仓库提供了 `android-app/android/keystore.properties.example` 示例；复制为 `keystore.properties` 后填写私密信息即可。没有私钥时仍可构建本地测试包，但不要把测试包当作正式发布包。
+
 第一次上传前，在 GitHub 网页上新建一个空仓库，建议仓库名使用 `xiamu-studio-booking`，不要勾选自动创建 README。然后在本项目文件夹打开 PowerShell，依次执行：
 
 ```bash
@@ -60,6 +62,8 @@ git push -u origin main
 执行 `git push` 时，GitHub 可能会打开网页登录授权。上传成功后，刷新 GitHub 仓库页面，就能看到源码、测试、说明书和 v1.2 安装包。不要上传 `夏暮工作室安卓签名密钥备份-请勿发给朋友.zip`，也不要把 `android-app/android/keystore.properties` 加入提交。
 
 如果不想使用命令行，也可以安装 GitHub Desktop，选择 `Add an Existing Repository`，指定本项目文件夹，点击 `Publish repository` 即可。
+
+GitHub Actions 会在提交或合并请求时自动运行测试和 Web 后台构建。
 
 Web 后台：
 

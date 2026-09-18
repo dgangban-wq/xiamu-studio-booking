@@ -4,7 +4,10 @@ const {
   calculateBookingFee,
   bookingConflicts,
   normalizeBookingInput,
-  publicFeeResult
+  publicFeeResult,
+  isBookingScheduleChanged,
+  isValidBookingStatus,
+  bookingNeedsConflictCheck
 } = require('./lib/core');
 
 cloud.init({
@@ -44,14 +47,40 @@ async function assertAdmin() {
   return result.data[0];
 }
 
-async function listPotentialConflicts(input) {
+async function listPotentialConflicts(input, database = db) {
   const normalized = normalizeBookingInput(input);
-  const result = await db.collection('bookings').where({
+  const result = await database.collection('bookings').where({
     scene_id: normalized.scene_id,
     date: normalized.date,
     status: _.neq('cancelled')
   }).get();
   return result.data;
+}
+
+function bookingLockId(sceneId, date) {
+  return `booking-${sceneId}-${date}`;
+}
+
+async function lockBookingResources(transaction, resources) {
+  const unique = new Map(resources.map((item) => [bookingLockId(item.scene_id, item.date), item]));
+  for (const [key, resource] of [...unique.entries()].sort(([left], [right]) => left.localeCompare(right))) {
+    await transaction.collection('booking_locks').doc(key).set({
+      data: {
+        scene_id: resource.scene_id,
+        date: resource.date,
+        updated_at: new Date().toISOString()
+      }
+    });
+  }
+}
+
+async function getAllBookings(ref, pageSize = 100) {
+  const records = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const page = await ref.skip(offset).limit(pageSize).get();
+    records.push(...page.data);
+    if (page.data.length < pageSize) return records;
+  }
 }
 
 async function calculateBookingFeeAction(event) {
@@ -108,10 +137,6 @@ async function createBooking(event) {
 
   if (!fee.ok) return fee;
 
-  const existingBookings = await listPotentialConflicts(fee.normalized);
-  const conflict = bookingConflicts(fee.normalized, existingBookings);
-  if (!conflict.ok) return conflict;
-
   const now = db.serverDate();
   const payload = {
     scene_id: fee.scene._id,
@@ -150,16 +175,31 @@ async function createBooking(event) {
     };
   }
 
-  const result = await db.collection('bookings').add({
-    data: payload
+  const result = await db.runTransaction(async (transaction) => {
+    // Serialize writes for one scene and date so two simultaneous submissions cannot both pass the conflict check.
+    await lockBookingResources(transaction, [{
+      scene_id: payload.scene_id,
+      date: payload.date
+    }]);
+    const existingBookings = await listPotentialConflicts(fee.normalized, transaction);
+    const conflict = bookingConflicts(fee.normalized, existingBookings);
+    if (!conflict.ok) return { conflict };
+
+    const created = await transaction.collection('bookings').add({ data: payload });
+    return {
+      created,
+      turnaround_warnings: conflict.turnaround_warnings
+    };
   });
+
+  if (result.conflict) return result.conflict;
 
   return {
     ok: true,
     data: {
-      _id: result._id,
+      _id: result.created._id,
       fee: publicFeeResult(fee),
-      turnaround_warnings: publicTurnaroundWarnings(conflict.turnaround_warnings)
+      turnaround_warnings: publicTurnaroundWarnings(result.turnaround_warnings)
     }
   };
 }
@@ -169,16 +209,27 @@ async function adminSearchBookings(event) {
   const query = {};
   if (event.date) query.date = event.date;
   if (event.scene_id) query.scene_id = event.scene_id;
-  if (event.status) query.status = event.status;
+  if (event.status) {
+    if (!isValidBookingStatus(event.status)) return { ok: false, errors: ['订单状态无效'] };
+    query.status = event.status;
+  }
 
-  let ref = db.collection('bookings').where(query);
-  const result = await ref.orderBy('date', 'desc').orderBy('start_minutes', 'asc').limit(100).get();
   const keyword = String(event.keyword || '').trim().toLowerCase();
+  const ref = db.collection('bookings').where(query);
+  const result = keyword
+    ? { data: await getAllBookings(ref) }
+    : await ref.orderBy('date', 'desc').orderBy('start_minutes', 'asc').limit(100).get();
   const data = keyword
-    ? result.data.filter((item) =>
+    ? result.data
+        .filter((item) =>
         String(item.customer_name || '').toLowerCase().includes(keyword) ||
         String(item.phone || '').includes(keyword)
-      )
+        )
+        .sort((left, right) =>
+          String(right.date || '').localeCompare(String(left.date || '')) ||
+          Number(left.start_minutes || 0) - Number(right.start_minutes || 0)
+        )
+        .slice(0, 100)
     : result.data;
 
   return {
@@ -192,50 +243,66 @@ async function adminUpdateBooking(event) {
   const id = event.booking_id;
   if (!id) return { ok: false, errors: ['缺少订单 ID'] };
 
-  const currentResult = await db.collection('bookings').doc(id).get();
-  const current = currentResult.data;
-  const update = {
-    updated_at: db.serverDate()
-  };
-
-  if (event.status) {
-    update.status = event.status;
+  if (event.status && !isValidBookingStatus(event.status)) {
+    return { ok: false, errors: ['订单状态无效'] };
   }
 
-  const hasScheduleChange = ['scene_id', 'date', 'start_time', 'end_time', 'people_count'].some((key) => event[key] !== undefined);
-  let feeResult = null;
-  let turnaroundWarnings = [];
+  const scenes = await getScenes();
+  const result = await db.runTransaction(async (transaction) => {
+    const current = (await transaction.collection('bookings').doc(id).get()).data;
+    if (!current) return { error: { ok: false, errors: ['订单不存在'] } };
 
-  if (hasScheduleChange) {
+    const hasScheduleChange = isBookingScheduleChanged(current, event);
+    const needsConflictCheck = bookingNeedsConflictCheck(current, event);
+    const hasPeopleChange = event.people_count !== undefined &&
+      Number(event.people_count) !== Number(current.people_count);
+    const update = {
+      updated_at: db.serverDate()
+    };
+    if (event.status) update.status = event.status;
+
+    if (!hasScheduleChange && !hasPeopleChange && !needsConflictCheck) {
+      await transaction.collection('bookings').doc(id).update({ data: update });
+      return { update, fee: null, turnaroundWarnings: [] };
+    }
+
+    const nextChangeCount = hasScheduleChange
+      ? Number(current.change_count || 0) + 1
+      : Number(current.change_count || 0);
     const next = {
       ...current,
-      scene_id: event.scene_id || current.scene_id,
-      date: event.date || current.date,
-      start_time: event.start_time || current.start_time,
-      end_time: event.end_time || current.end_time,
-      people_count: event.people_count || current.people_count,
+      scene_id: event.scene_id ?? current.scene_id,
+      date: event.date ?? current.date,
+      start_time: event.start_time ?? current.start_time,
+      end_time: event.end_time ?? current.end_time,
+      people_count: event.people_count ?? current.people_count,
       exclude_id: id
     };
-    const nextChangeCount = Number(current.change_count || 0) + 1;
-    const scenes = await getScenes();
     const holidays = await getHolidayOverrides(next.date);
     const fee = calculateBookingFee(next, {
       scenes,
       holidays,
       changeCount: nextChangeCount
     });
-    if (!fee.ok) return fee;
+    if (!fee.ok) return { error: fee };
 
-    const existingBookings = await listPotentialConflicts({
-      ...fee.normalized,
-      exclude_id: id
-    });
-    const conflict = bookingConflicts({
-      ...fee.normalized,
-      exclude_id: id
-    }, existingBookings);
-    if (!conflict.ok) return conflict;
-    turnaroundWarnings = publicTurnaroundWarnings(conflict.turnaround_warnings);
+    let turnaroundWarnings = [];
+    if (needsConflictCheck) {
+      await lockBookingResources(transaction, [
+        { scene_id: current.scene_id, date: current.date },
+        { scene_id: fee.scene._id, date: fee.normalized.date }
+      ]);
+      const existingBookings = await listPotentialConflicts({
+        ...fee.normalized,
+        exclude_id: id
+      }, transaction);
+      const conflict = bookingConflicts({
+        ...fee.normalized,
+        exclude_id: id
+      }, existingBookings);
+      if (!conflict.ok) return { error: conflict };
+      turnaroundWarnings = publicTurnaroundWarnings(conflict.turnaround_warnings);
+    }
 
     Object.assign(update, {
       scene_id: fee.scene._id,
@@ -256,21 +323,19 @@ async function adminUpdateBooking(event) {
       deposit_amount: fee.deposit_amount,
       change_count: nextChangeCount
     });
-    feeResult = publicFeeResult(fee);
-  }
-
-  await db.collection('bookings').doc(id).update({
-    data: update
+    await transaction.collection('bookings').doc(id).update({ data: update });
+    return { update, fee, turnaroundWarnings };
   });
 
+  if (result.error) return result.error;
   return {
     ok: true,
     data: {
       booking_id: id,
-      changed: update,
-      fee: feeResult,
-      warnings: feeResult ? feeResult.warnings : [],
-      turnaround_warnings: turnaroundWarnings
+      changed: result.update,
+      fee: result.fee ? publicFeeResult(result.fee) : null,
+      warnings: result.fee ? result.fee.warnings : [],
+      turnaround_warnings: result.turnaroundWarnings
     }
   };
 }

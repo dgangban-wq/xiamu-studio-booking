@@ -22,11 +22,10 @@ test('android manifest is local-only and does not request internet access', () =
 });
 
 test('android web bundle includes native backup support before app startup', () => {
-  const html = fs.readFileSync(path.join(androidRoot, 'www', 'index.html'), 'utf8');
-  const bridgePosition = html.indexOf('./native-bridge.js');
-  const appPosition = html.indexOf('./app.js');
-  assert.ok(bridgePosition >= 0);
-  assert.ok(appPosition > bridgePosition);
+  const syncScript = fs.readFileSync(path.join(androidRoot, 'scripts', 'sync-web.mjs'), 'utf8');
+  assert.match(syncScript, /native-bridge\.js/);
+  assert.match(syncScript, /app\.js/);
+  assert.match(syncScript, /bridgePosition|withBridge|replace/);
 
   const bridge = fs.readFileSync(path.join(androidRoot, 'src', 'native-bridge.js'), 'utf8');
   assert.match(bridge, /Filesystem\.writeFile/);
@@ -47,4 +46,12 @@ test('android v1.2 handles the native back button without adding network access'
   assert.match(bridge, /xiamu:native-back/);
   assert.match(gradle, /versionCode 3/);
   assert.match(gradle, /versionName "1\.2"/);
+});
+
+test('public Android source has a safe signing fallback and a secrets-free example', () => {
+  const gradle = fs.readFileSync(path.join(androidRoot, 'android', 'app', 'build.gradle'), 'utf8');
+  const example = fs.readFileSync(path.join(androidRoot, 'android', 'keystore.properties.example'), 'utf8');
+
+  assert.match(gradle, /keystorePropertiesFile\.exists\(\) \? signingConfigs\.release : signingConfigs\.debug/);
+  assert.doesNotMatch(example, /xiamu-release-secure|真实密码|[A-Za-z0-9]{24,}/);
 });
