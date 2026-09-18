@@ -49,6 +49,8 @@ npm.cmd test
 
 安卓 release 构建需要工作室自己的签名密钥。公开仓库提供了 `android-app/android/keystore.properties.example` 示例；复制为 `keystore.properties` 后填写私密信息即可。没有私钥时仍可构建本地测试包，但不要把测试包当作正式发布包。
 
+安卓构建还需要本机安装 Android SDK，并设置 `ANDROID_HOME` 或在 `android-app/android/local.properties` 中配置 `sdk.dir`。`local.properties` 已被忽略，不会进入 GitHub。
+
 第一次上传前，在 GitHub 网页上新建一个空仓库，建议仓库名使用 `xiamu-studio-booking`，不要勾选自动创建 README。然后在本项目文件夹打开 PowerShell，依次执行：
 
 ```bash
