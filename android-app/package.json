@@ -1,0 +1,27 @@
+{
+  "name": "xiamu-studio-android",
+  "version": "1.2.0",
+  "private": true,
+  "description": "夏暮工作室摄影棚预约离线安卓 App",
+  "scripts": {
+    "sync:web": "node scripts/sync-web.mjs",
+    "assets": "node scripts/generate-assets.mjs && capacitor-assets generate --android --assetPath assets --iconBackgroundColor '#ffffff' --splashBackgroundColor '#f7fbef'",
+    "sync:android": "npm run sync:web && cap sync android",
+    "build:debug": "npm run sync:android && cd android && gradlew.bat assembleDebug",
+    "build:release": "npm run sync:android && cd android && gradlew.bat assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.4.2",
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/core": "8.4.2",
+    "@capacitor/filesystem": "8.1.2",
+    "@capacitor/share": "8.0.1",
+    "lucide": "^1.25.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.4.2",
+    "esbuild": "^0.25.0",
+    "sharp": "^0.34.0"
+  }
+}

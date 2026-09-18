@@ -1,0 +1,22 @@
+page {
+  min-height: 100%;
+  color: #f6f0e8;
+  background: #08090d;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+button {
+  border-radius: 8rpx;
+}
+
+.muted {
+  color: #9298a5;
+}
+
+.price {
+  color: #ff8a2a;
+}
+
+.blue {
+  color: #3aa6ff;
+}

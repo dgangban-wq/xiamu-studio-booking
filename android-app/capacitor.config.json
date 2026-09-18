@@ -1,0 +1,9 @@
+{
+  "appId": "com.xiamustudio.booking",
+  "appName": "夏暮工作室摄影棚预约",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#f7fbef"
+  }
+}

@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f7fbef" />
+    <title>夏暮工作室摄影棚预约</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./styles.css?v=19" />
+  </head>
+  <body data-active-tab="book">
+    <div id="pullStatus" class="pull-status" role="status" aria-live="polite">
+      <i data-lucide="database"></i>
+      <span id="pullStatusText">本机数据正常</span>
+    </div>
+
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand-card">
+          <img class="brand-logo" src="./logo.jpg" alt="夏暮工作室 Logo" />
+          <div class="brand-copy">
+            <p class="eyebrow">XIAMU STUDIO</p>
+            <h1>夏暮工作室摄影棚预约</h1>
+            <p>夏日、海风、日落感的本地预约管理</p>
+          </div>
+        </div>
+        <button id="installBtn" class="icon-btn" hidden>安装</button>
+      </header>
+
+      <nav class="tabs bottom-nav" aria-label="主要功能">
+        <button class="tab active" data-tab="book" aria-current="page">
+          <i data-lucide="calendar-plus"></i><span>预约</span>
+        </button>
+        <button class="tab" data-tab="orders">
+          <i data-lucide="clipboard-list"></i><span>订单</span>
+        </button>
+        <button class="tab" data-tab="calendar">
+          <i data-lucide="calendar-days"></i><span>档期</span>
+        </button>
+        <button class="tab" data-tab="income">
+          <i data-lucide="wallet-cards"></i><span>收入</span>
+        </button>
+        <button class="tab" data-tab="settings">
+          <i data-lucide="settings"></i><span>设置</span>
+        </button>
+      </nav>
+
+      <section id="localAlert" class="local-alert">
+        <i data-lucide="hard-drive"></i>
+        <div>
+          <strong>本机离线保存</strong>
+          <span>关机和退出不会丢失；卸载或清除数据前请先备份。</span>
+        </div>
+        <button id="dismissLocalAlert" class="plain-icon" type="button" aria-label="收起离线提示">
+          <i data-lucide="x"></i>
+        </button>
+      </section>
+
+      <section class="quick-summary" aria-label="今日概览">
+        <article>
+          <span>今日订单</span>
+          <strong id="todayCount">0</strong>
+        </article>
+        <article>
+          <span>今日实收</span>
+          <strong id="todayRevenue">¥0</strong>
+        </article>
+        <article class="wide">
+          <span>下一场</span>
+          <strong id="nextBooking">暂无预约</strong>
+        </article>
+        <button id="backupHealthCard" class="backup-health wide" type="button">
+          <i data-lucide="shield-check"></i>
+          <span><b id="backupHealthTitle">本机数据正常</b><small id="backupHealthText">暂无订单</small></span>
+          <i data-lucide="chevron-right"></i>
+        </button>
+      </section>
+
+      <section id="book" class="screen active">
+        <form id="bookingForm" class="panel booking-panel" novalidate>
+          <div class="section-head">
+            <div>
+              <span class="section-kicker">快速建单</span>
+              <h2>新建预约</h2>
+            </div>
+            <span id="datePriceType" class="price-type">工作日价</span>
+          </div>
+
+          <div class="field">
+            <label for="scene">场景</label>
+            <select id="scene" name="scene_id"></select>
+            <small class="field-error" data-field-error="scene"></small>
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label for="date">日期</label>
+              <input id="date" name="date" type="date" required />
+              <small class="field-error" data-field-error="date"></small>
+            </div>
+            <div class="field">
+              <label for="people">人数</label>
+              <input id="people" name="people_count" type="number" min="1" value="1" inputmode="numeric" required />
+              <small class="field-error" data-field-error="people"></small>
+            </div>
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label for="start">开始</label>
+              <input id="start" name="start_time" type="time" step="1800" value="10:00" required />
+              <small class="field-error" data-field-error="start"></small>
+            </div>
+            <div class="field">
+              <label for="end">结束</label>
+              <input id="end" name="end_time" type="time" step="1800" value="12:00" required />
+              <small class="field-error" data-field-error="end"></small>
+            </div>
+          </div>
+
+          <div class="duration-chips" aria-label="常用预约时长">
+            <button type="button" data-duration="120">2小时</button>
+            <button type="button" data-duration="240">4小时</button>
+            <button type="button" data-duration="480">8小时</button>
+          </div>
+
+          <div id="availabilityPreview" class="availability-preview" role="status" aria-live="polite">
+            <i data-lucide="circle-check"></i><span>当前时段可预约</span>
+          </div>
+
+          <div id="turnaroundPreview" class="turnaround-alert form-turnaround" role="status" aria-live="polite" hidden>
+            <strong>紧邻档期提醒</strong>
+            <span class="turnaround-text"></span>
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label for="customer">客户姓名</label>
+              <input id="customer" name="customer_name" autocomplete="name" placeholder="例如：小夏" required />
+              <small class="field-error" data-field-error="customer"></small>
+            </div>
+            <div class="field">
+              <label for="phone">手机号</label>
+              <input id="phone" name="phone" type="tel" inputmode="numeric" maxlength="11" autocomplete="tel" placeholder="11 位手机号" required />
+              <small class="field-error" data-field-error="phone"></small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="wechat">微信号</label>
+            <input id="wechat" name="wechat" autocomplete="off" placeholder="用于联系确认" required />
+            <small class="field-error" data-field-error="wechat"></small>
+          </div>
+
+          <section class="fee-card">
+            <div class="fee-main">
+              <span>预计总金额</span>
+              <strong id="totalFee">¥0</strong>
+            </div>
+            <div class="fee-grid">
+              <span>基础费 <b id="baseFee">¥0</b></span>
+              <span>加班费 <b id="overtimeFee">¥0</b></span>
+              <span>超人费 <b id="extraFee">¥0</b></span>
+              <span>订金 <b id="depositFee">¥0</b></span>
+            </div>
+            <div id="warnings" class="warnings"></div>
+          </section>
+
+          <button class="primary desktop-submit" type="submit">保存预约</button>
+        </form>
+
+        <details class="notice">
+          <summary>预约须知</summary>
+          <p>订金用于锁定档期，支付后不退。单场 2 小时起租，赠送 1 小时化妆时间。15 分钟收尾时间不占用档期；前后订单相隔不足 15 分钟时，系统会提醒棚主联系下一单客户。第二次及以后改签需额外加收 50 元。</p>
+        </details>
+      </section>
+
+      <section id="orders" class="screen">
+        <div class="panel compact filter-panel">
+          <div class="section-head">
+            <div><span class="section-kicker">快速检索</span><h2>订单管理</h2></div>
+            <b id="orderResultCount" class="result-count">0 条</b>
+          </div>
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input id="search" aria-label="搜索订单" placeholder="姓名 / 手机号 / 日期" />
+            <button id="clearSearch" class="plain-icon" type="button" aria-label="清除搜索"><i data-lucide="x"></i></button>
+          </div>
+          <div id="statusChips" class="status-chips" aria-label="订单状态筛选">
+            <button type="button" class="active" data-status="">全部</button>
+            <button type="button" data-status="pending">待确认</button>
+            <button type="button" data-status="deposit_paid">已付</button>
+            <button type="button" data-status="completed">已完成</button>
+            <button type="button" data-status="cancelled">已取消</button>
+          </div>
+          <div class="field scene-filter-field">
+            <label for="sceneFilter">场景</label>
+            <select id="sceneFilter"></select>
+          </div>
+          <select id="statusFilter" aria-label="状态" hidden></select>
+        </div>
+        <p id="swipeOrderHint" class="gesture-hint"><i data-lucide="move-horizontal"></i> 左滑查看改签与取消，右滑确认订金；所有操作也可使用卡片按钮。</p>
+        <div id="ordersList" class="list"></div>
+      </section>
+
+      <section id="calendar" class="screen">
+        <div class="panel compact calendar-toolbar">
+          <div class="section-head">
+            <div><span class="section-kicker">当天占用</span><h2>棚位档期</h2></div>
+            <button id="calendarToday" class="text-button" type="button">今天</button>
+          </div>
+          <div class="date-stepper">
+            <button id="calendarPrev" class="icon-button" type="button" aria-label="前一天"><i data-lucide="chevron-left"></i></button>
+            <div class="field"><label for="calendarDate">查看日期</label><input id="calendarDate" type="date" /></div>
+            <button id="calendarNext" class="icon-button" type="button" aria-label="后一天"><i data-lucide="chevron-right"></i></button>
+          </div>
+          <p class="gesture-hint"><i data-lucide="move-horizontal"></i> 在下方档期区域左右滑动切换日期</p>
+        </div>
+        <div id="calendarList" class="lanes schedule-board" aria-live="polite"></div>
+      </section>
+
+      <section id="income" class="screen">
+        <div class="income-heading">
+          <div><span class="section-kicker">实际到账</span><h2>收入记账</h2></div>
+          <button id="addIncome" class="primary income-add" type="button"><i data-lucide="plus"></i>记一笔</button>
+        </div>
+
+        <section class="income-summary" aria-label="收入概览">
+          <article><span>今日</span><strong id="incomeToday">¥0</strong></article>
+          <article><span>本周</span><strong id="incomeWeek">¥0</strong></article>
+          <article><span>本月</span><strong id="incomeMonth">¥0</strong></article>
+        </section>
+
+        <section class="panel income-period-panel">
+          <div class="period-tabs" aria-label="统计周期">
+            <button class="active" type="button" data-income-period="day">日</button>
+            <button type="button" data-income-period="week">周</button>
+            <button type="button" data-income-period="month">月</button>
+          </div>
+          <div class="income-date-stepper">
+            <button id="incomePrev" class="icon-button" type="button" aria-label="上一个周期"><i data-lucide="chevron-left"></i></button>
+            <div class="field"><label for="incomeAnchorDate">统计日期</label><input id="incomeAnchorDate" type="date" /></div>
+            <button id="incomeNext" class="icon-button" type="button" aria-label="下一个周期"><i data-lucide="chevron-right"></i></button>
+            <button id="incomeTodayButton" class="text-button" type="button">今天</button>
+          </div>
+          <div class="income-total-row">
+            <div><small id="incomePeriodLabel">今日实收</small><strong id="incomePeriodTotal">¥0</strong></div>
+            <span id="incomeRecordCount">0 笔</span>
+          </div>
+          <div id="incomeChart" class="income-chart" aria-label="收入趋势图"></div>
+        </section>
+
+        <section class="income-ledger-section">
+          <div class="section-head"><div><span class="section-kicker">收款流水</span><h2>明细</h2></div></div>
+          <div id="incomeList" class="income-list" aria-live="polite"></div>
+        </section>
+      </section>
+
+      <section id="settings" class="screen">
+        <section class="panel data-panel">
+          <div class="section-head"><div><span class="section-kicker">数据安全</span><h2>本地数据</h2></div></div>
+          <div id="backupStatusPanel" class="backup-status-panel">
+            <i data-lucide="shield-check"></i>
+            <div><strong id="settingsBackupTitle">本机数据正常</strong><span>上次备份：<b id="lastBackup">暂无记录</b></span></div>
+          </div>
+          <div class="guide-links">
+            <a class="guide-link" href="./图文使用说明书.html" target="_blank" rel="noopener"><i data-lucide="book-open"></i>图文说明书</a>
+            <button id="openGuideViewer" class="guide-link" type="button"><i data-lucide="image"></i>App 内查看一图流</button>
+          </div>
+          <div class="field">
+            <label for="importMode">导入方式</label>
+            <select id="importMode">
+              <option value="merge">合并导入，不覆盖本机新订单</option>
+              <option value="replace">覆盖导入，会替换本机订单</option>
+            </select>
+          </div>
+          <div class="button-row">
+            <button id="exportData" type="button"><i data-lucide="download"></i>导出备份</button>
+            <label class="file-btn"><i data-lucide="upload"></i>导入备份<input id="importData" type="file" accept="application/json" hidden /></label>
+          </div>
+          <div class="danger-zone">
+            <strong>危险操作</strong>
+            <button id="clearData" class="danger" type="button"><i data-lucide="trash-2"></i>清空订单和收入</button>
+          </div>
+        </section>
+
+        <section class="panel holiday-panel">
+          <div class="section-head"><div><span class="section-kicker">价格规则</span><h2>节假日 / 补班</h2></div></div>
+          <div class="two">
+            <div class="field"><label for="holidayDate">日期</label><input id="holidayDate" type="date" /></div>
+            <div class="field">
+              <label for="holidayType">类型</label>
+              <select id="holidayType"><option value="holiday">节假日</option><option value="workday">补班工作日</option></select>
+            </div>
+          </div>
+          <div class="field"><label for="holidayName">名称</label><input id="holidayName" placeholder="例如：国庆节 / 调休补班" /></div>
+          <button id="addHoliday" class="primary" type="button">保存日期规则</button>
+          <details id="holidayRulesDetails" class="holiday-rules-details">
+            <summary>查看全年日期规则 <span id="holidayRuleCount"></span></summary>
+            <label class="toggle-line"><input id="customHolidayOnly" type="checkbox" />只看手动添加</label>
+            <div id="holidayList" class="mini-list"></div>
+          </details>
+        </section>
+
+        <section class="panel about-panel">
+          <div class="about-version-row">
+            <div>
+              <span class="section-kicker">关于应用</span>
+              <h2>夏暮工作室摄影棚预约</h2>
+              <small>当前版本 <strong id="appVersion">v1.2</strong></small>
+            </div>
+            <img src="./logo.jpg" alt="" />
+          </div>
+          <button id="openChangelog" class="version-link" type="button">
+            <i data-lucide="history"></i>
+            <span><strong>查看更新内容</strong><small>了解 v1.1 与 v1.2 的新功能</small></span>
+            <i data-lucide="chevron-right"></i>
+          </button>
+        </section>
+      </section>
+    </main>
+
+    <div id="bookingSubmitBar" class="booking-submit-bar">
+      <div><span>预计 <strong id="stickyTotalFee">¥0</strong></span><small>订金 <b id="stickyDepositFee">¥0</b></small></div>
+      <button class="primary" type="submit" form="bookingForm">保存预约</button>
+    </div>
+
+    <template id="orderTemplate">
+      <div class="order-swipe-shell">
+        <div class="swipe-reveal swipe-paid"><button class="mark-paid" type="button"><i data-lucide="badge-check"></i>确认订金</button></div>
+        <div class="swipe-reveal swipe-manage"><button class="swipe-reschedule" type="button">改签</button><button class="swipe-cancel" type="button">取消</button></div>
+        <article class="order-card">
+          <div class="card-head">
+            <div><strong class="order-title"></strong><p class="order-time"></p></div>
+            <span class="status-pill"></span>
+          </div>
+          <div class="contact-row">
+            <p class="order-contact"></p>
+            <button class="copy-phone plain-icon" type="button" aria-label="复制手机号"><i data-lucide="phone"></i></button>
+            <button class="copy-wechat plain-icon" type="button" aria-label="复制微信号"><i data-lucide="copy"></i></button>
+          </div>
+          <div class="fee-line"></div>
+          <div class="turnaround-alert" role="status" hidden><strong>紧邻档期</strong><span class="turnaround-text"></span></div>
+          <div class="actions">
+            <select class="status-select" aria-label="订单状态"></select>
+            <button class="reschedule" type="button">改签</button>
+            <button class="cancel-order" type="button">取消</button>
+          </div>
+        </article>
+      </div>
+    </template>
+
+    <dialog id="editDialog" class="bottom-sheet">
+      <form method="dialog" class="dialog-card">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head"><h2>订单改签</h2><button class="plain-icon close-sheet" value="cancel" type="submit" aria-label="关闭"><i data-lucide="x"></i></button></div>
+        <p id="editOriginal" class="original-schedule"></p>
+        <input id="editId" type="hidden" />
+        <div class="field"><label for="editDate">新日期</label><input id="editDate" type="date" /></div>
+        <div class="two">
+          <div class="field"><label for="editStart">开始</label><input id="editStart" type="time" step="1800" /></div>
+          <div class="field"><label for="editEnd">结束</label><input id="editEnd" type="time" step="1800" /></div>
+        </div>
+        <div class="field"><label for="editPeople">人数</label><input id="editPeople" type="number" min="1" /></div>
+        <div id="editImpact" class="edit-impact" role="status"></div>
+        <div class="button-row"><button value="cancel" type="submit">取消</button><button id="saveEdit" class="primary" value="default" type="button">保存改签</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="saveSuccessDialog" class="bottom-sheet success-sheet">
+      <div class="dialog-card">
+        <div class="sheet-handle"></div>
+        <div class="success-icon"><i data-lucide="circle-check-big"></i></div>
+        <h2>预约已保存</h2>
+        <div id="saveSuccessDetails" class="success-details"></div>
+        <div class="button-row"><button id="continueBooking" type="button">继续预约</button><button id="viewSavedOrder" class="primary" type="button">查看订单</button></div>
+      </div>
+    </dialog>
+
+    <dialog id="orderDetailDialog" class="bottom-sheet">
+      <div class="dialog-card">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head"><h2>订单详情</h2><button id="closeOrderDetail" class="plain-icon" type="button" aria-label="关闭"><i data-lucide="x"></i></button></div>
+        <div id="orderDetailContent" class="order-detail-content"></div>
+      </div>
+    </dialog>
+
+    <dialog id="incomeDialog" class="bottom-sheet">
+      <form id="incomeForm" class="dialog-card" novalidate>
+        <div class="sheet-handle"></div>
+        <div class="sheet-head"><h2>记录实际收款</h2><button id="closeIncomeDialog" class="plain-icon" type="button" aria-label="关闭"><i data-lucide="x"></i></button></div>
+        <p class="form-note">只有实际收到的钱才记在这里，预约预计金额不会自动计入收入。</p>
+        <div class="field">
+          <label for="incomeBooking">关联订单（可不选）</label>
+          <select id="incomeBooking"></select>
+        </div>
+        <div class="two">
+          <div class="field"><label for="incomeDate">收款日期</label><input id="incomeDate" type="date" required /></div>
+          <div class="field"><label for="incomeAmount">实收金额</label><input id="incomeAmount" type="number" min="0.01" max="10000000" step="0.01" inputmode="decimal" placeholder="0.00" required /></div>
+        </div>
+        <div class="two">
+          <div class="field"><label for="incomeCategory">收款类型</label><select id="incomeCategory"></select></div>
+          <div class="field"><label for="incomeCustomer">客户姓名</label><input id="incomeCustomer" maxlength="50" placeholder="可选" /></div>
+        </div>
+        <div class="field"><label for="incomeNote">备注</label><input id="incomeNote" maxlength="200" placeholder="例如：微信收款 / 补拍加时" /></div>
+        <div id="incomeFormError" class="form-error" role="alert"></div>
+        <div class="button-row"><button id="cancelIncome" type="button">取消</button><button class="primary" type="submit">保存收入</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="guideViewerDialog" class="guide-viewer">
+      <div class="guide-viewer-card">
+        <header>
+          <div><small>XIAMU STUDIO</small><h2>一图流使用介绍</h2></div>
+          <div class="guide-viewer-actions">
+            <button id="zoomGuide" class="icon-button" type="button" aria-label="放大一图流"><i data-lucide="zoom-in"></i></button>
+            <button id="resetGuideZoom" class="icon-button" type="button" aria-label="恢复一图流大小"><i data-lucide="scan"></i></button>
+            <button id="closeGuideViewer" class="icon-button" type="button" aria-label="关闭一图流"><i data-lucide="x"></i></button>
+          </div>
+        </header>
+        <div id="guideViewerCanvas" class="guide-viewer-canvas">
+          <img id="guideViewerImage" src="./one-page-guide.svg" alt="夏暮工作室摄影棚预约 App 一图流使用介绍" />
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="changelogDialog" class="bottom-sheet changelog-sheet">
+      <div class="dialog-card">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head"><h2>版本更新内容</h2><button id="closeChangelog" class="plain-icon" type="button" aria-label="关闭更新内容"><i data-lucide="x"></i></button></div>
+        <div class="release-list">
+          <article class="release-item current">
+            <header><strong>版本 1.2</strong><span>当前版本</span></header>
+            <ul>
+              <li>新增实际收入记账，支持日、周、月统计和收款明细。</li>
+              <li>订单详情可关联收款，订单和收入一起备份恢复。</li>
+              <li>一图流可在 App 内自适应查看、放大和还原。</li>
+              <li>设置页新增版本号和更新内容入口。</li>
+            </ul>
+          </article>
+          <article class="release-item">
+            <header><strong>版本 1.1</strong><span>交互优化</span></header>
+            <ul>
+              <li>增加底部导航、固定费用栏和表单错误定位。</li>
+              <li>增加订单侧滑、档期左右滑动和全天时间轴。</li>
+              <li>优化弹窗下滑、安卓返回键、备份状态和手势防误触。</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="./lucide.min.js"></script>
+    <script src="./app.js?v=19"></script>
+  </body>
+</html>

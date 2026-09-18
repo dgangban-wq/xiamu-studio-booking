@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMin meet" style="display:block;width:100%;height:auto;max-width:100vw;margin:0 auto">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fffdf7"/>
+      <stop offset="0.48" stop-color="#f5fbf4"/>
+      <stop offset="1" stop-color="#dff4f0"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#ff8427"/>
+      <stop offset="1" stop-color="#f5b45b"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#348fbd"/>
+      <stop offset="1" stop-color="#168b85"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#1f5b7a" flood-opacity="0.18"/>
+    </filter>
+    <style>
+      .title{font:700 58px "PingFang SC","Microsoft YaHei",sans-serif;fill:#19415f}
+      .sub{font:400 25px "PingFang SC","Microsoft YaHei",sans-serif;fill:#718997}
+      .eyebrow{font:800 20px "PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:5px;fill:#168b85}
+      .h{font:700 30px "PingFang SC","Microsoft YaHei",sans-serif;fill:#19415f}
+      .p{font:400 22px "PingFang SC","Microsoft YaHei",sans-serif;fill:#718997}
+      .small{font:700 20px "PingFang SC","Microsoft YaHei",sans-serif;fill:#19415f}
+      .num{font:900 30px "PingFang SC","Microsoft YaHei",sans-serif;fill:#fff}
+    </style>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#bg)"/>
+  <path d="M0 240 C220 140 360 310 560 210 C760 110 920 120 1080 190 L1080 0 L0 0Z" fill="#fff4cc" opacity="0.8"/>
+  <path d="M0 1730 C210 1640 350 1810 560 1710 C760 1615 915 1635 1080 1710 L1080 1920 L0 1920Z" fill="#dff4f0" opacity="0.9"/>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="70" width="940" height="245" rx="42" fill="#ffffff" opacity="0.9"/>
+    <image href="./logo.jpg" x="104" y="104" width="150" height="150" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="104" y="104" width="150" height="150" rx="32" fill="none" stroke="#ffffff" stroke-width="12"/>
+    <text x="286" y="130" class="eyebrow">XIAMU STUDIO</text>
+    <text x="286" y="195" class="title">夏暮预约 App</text>
+    <text x="286" y="246" class="sub">离线保存 · 自动算价 · 防撞档 · 实收记账</text>
+  </g>
+
+  <g transform="translate(70 365)">
+    <text x="0" y="0" class="title" font-size="46">一图看懂怎么用</text>
+    <text x="0" y="48" class="sub">照着 6 步走，就能完成日常预约管理</text>
+  </g>
+
+  <g transform="translate(70 465)" filter="url(#shadow)">
+    <rect width="940" height="820" rx="38" fill="#ffffff" opacity="0.88"/>
+
+    <g transform="translate(52 58)">
+      <circle cx="34" cy="34" r="34" fill="url(#sun)"/><text x="24" y="45" class="num">1</text>
+      <text x="92" y="31" class="h">先看档期</text>
+      <text x="92" y="70" class="p">进入“档期”，选择日期，查看每个场景是否空闲。</text>
+    </g>
+
+    <path d="M86 148 L86 190" stroke="#d6e9e6" stroke-width="8" stroke-linecap="round"/>
+
+    <g transform="translate(52 205)">
+      <circle cx="34" cy="34" r="34" fill="url(#sea)"/><text x="24" y="45" class="num">2</text>
+      <text x="92" y="31" class="h">填写预约</text>
+      <text x="92" y="70" class="p">选择场景、日期、开始/结束时间、人数，填写客户信息。</text>
+    </g>
+
+    <path d="M86 295 L86 337" stroke="#d6e9e6" stroke-width="8" stroke-linecap="round"/>
+
+    <g transform="translate(52 352)">
+      <circle cx="34" cy="34" r="34" fill="url(#sun)"/><text x="24" y="45" class="num">3</text>
+      <text x="92" y="31" class="h">确认费用</text>
+      <text x="92" y="70" class="p">系统自动计算基础费、加班费、超人费、订金和总金额。</text>
+    </g>
+
+    <path d="M86 442 L86 484" stroke="#d6e9e6" stroke-width="8" stroke-linecap="round"/>
+
+    <g transform="translate(52 499)">
+      <circle cx="34" cy="34" r="34" fill="url(#sea)"/><text x="24" y="45" class="num">4</text>
+      <text x="92" y="31" class="h">保存订单</text>
+      <text x="92" y="70" class="p">真实时间重叠会拦截；首尾紧接可保存，并醒目提醒下一单客户。</text>
+    </g>
+
+    <path d="M86 589 L86 631" stroke="#d6e9e6" stroke-width="8" stroke-linecap="round"/>
+
+    <g transform="translate(52 646)">
+      <circle cx="34" cy="34" r="34" fill="url(#sun)"/><text x="24" y="45" class="num">5</text>
+      <text x="92" y="31" class="h">管理状态并记收入</text>
+      <text x="92" y="70" class="p">收到钱后进“收入”记账，可查看今日、本周和本月实际收入。</text>
+    </g>
+  </g>
+
+  <g transform="translate(70 1335)" filter="url(#shadow)">
+    <rect width="940" height="230" rx="38" fill="#fff4cc" opacity="0.95"/>
+    <circle cx="86" cy="82" r="34" fill="url(#sea)"/><text x="76" y="93" class="num">6</text>
+    <text x="138" y="79" class="h">每天结束导出备份</text>
+    <text x="138" y="122" class="p">进入“设置”点“导出备份”，把 json 文件发到微信文件助手或网盘。</text>
+    <text x="138" y="164" class="p">订单和收入会一起备份；换手机时选“合并导入”。</text>
+  </g>
+
+  <g transform="translate(70 1605)" filter="url(#shadow)">
+    <rect width="940" height="205" rx="38" fill="#ffffff" opacity="0.9"/>
+    <text x="42" y="58" class="h">关键提醒</text>
+    <text x="42" y="104" class="p">订单和收入只存在当前设备，不会自动同步到电脑或其他手机。</text>
+    <text x="42" y="145" class="p">手机关机、关闭浏览器一般不会丢；清缓存、换手机前必须先备份。</text>
+  </g>
+
+  <text x="70" y="1866" class="small">夏暮工作室摄影棚预约 · 图文说明见 图文使用说明书.html</text>
+</svg>

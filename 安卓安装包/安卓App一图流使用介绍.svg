@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMin meet" style="display:block;width:100%;height:auto;max-width:100vw;margin:0 auto" role="img" aria-labelledby="posterTitle posterDescription">
+  <title id="posterTitle">夏暮工作室摄影棚预约 App 一图流使用介绍</title>
+  <desc id="posterDescription">介绍安卓 App 的安装、预约、档期管理、收入记账、备份和数据安全注意事项。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffdf7"/>
+      <stop offset="0.52" stop-color="#f3fbf5"/>
+      <stop offset="1" stop-color="#dff4f0"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff8427"/>
+      <stop offset="1" stop-color="#f6b64e"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="20" flood-color="#1f5b7a" flood-opacity="0.14"/>
+    </filter>
+    <style>
+      .brand{font:800 56px "Microsoft YaHei","PingFang SC",sans-serif;fill:#19415f}
+      .sub{font:400 24px "Microsoft YaHei","PingFang SC",sans-serif;fill:#688494}
+      .step{font:800 28px "Microsoft YaHei","PingFang SC",sans-serif;fill:#19415f}
+      .body{font:400 22px "Microsoft YaHei","PingFang SC",sans-serif;fill:#587485}
+      .num{font:900 29px "Microsoft YaHei","PingFang SC",sans-serif;fill:#fff}
+      .warn{font:700 22px "Microsoft YaHei","PingFang SC",sans-serif;fill:#19415f}
+      .tiny{font:400 19px "Microsoft YaHei","PingFang SC",sans-serif;fill:#688494}
+    </style>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg)"/>
+  <circle cx="925" cy="95" r="180" fill="#fff1c9" opacity="0.8"/>
+  <path d="M0 1780 C220 1665 405 1835 615 1730 C800 1640 935 1670 1080 1730 L1080 1920 L0 1920Z" fill="#cdeee8"/>
+
+  <g filter="url(#shadow)">
+    <rect x="60" y="58" width="960" height="242" rx="30" fill="#fff" opacity="0.94"/>
+    <rect x="92" y="92" width="172" height="172" rx="26" fill="#fff7e6"/>
+    <circle cx="178" cy="154" r="48" fill="url(#accent)"/>
+    <path d="M122 171 H234 V226 H122Z" fill="#348fbd"/>
+    <path d="M122 201 C150 177 177 230 210 201 C220 192 228 189 234 188 V226 H122Z" fill="#2d65a1"/>
+    <text x="300" y="132" class="sub">XIAMU STUDIO · ANDROID</text>
+    <text x="300" y="198" class="brand">夏暮摄影棚预约</text>
+    <text x="300" y="246" class="sub">离线本地版 · 无需账号 · 无需联网</text>
+  </g>
+
+  <g transform="translate(60 342)">
+    <rect width="960" height="170" rx="24" fill="#fff" filter="url(#shadow)"/>
+    <circle cx="62" cy="58" r="30" fill="#ff8427"/><text x="53" y="68" class="num">1</text>
+    <text x="110" y="66" class="step">安装 APK</text>
+    <text x="110" y="108" class="body">点“夏暮工作室摄影棚预约-v1.2.apk”并允许本次安装。</text>
+    <text x="110" y="142" class="tiny">支持 Android 7.0 及以上；苹果手机不能安装 APK。</text>
+  </g>
+
+  <g transform="translate(60 542)">
+    <rect width="960" height="204" rx="24" fill="#fff" filter="url(#shadow)"/>
+    <circle cx="62" cy="58" r="30" fill="#348fbd"/><text x="53" y="68" class="num">2</text>
+    <text x="110" y="66" class="step">填写并保存预约</text>
+    <text x="110" y="108" class="body">选场景、日期、起止时间、人数，填写姓名、手机号、微信号。</text>
+    <text x="110" y="144" class="body">系统自动算价，并检查 2 小时起租、30 分钟粒度和撞档。</text>
+    <text x="110" y="180" class="tiny">上一单结束后 15 分钟不拦截下一单，但会显示醒目收尾提醒。</text>
+  </g>
+
+  <g transform="translate(60 776)">
+    <rect width="960" height="190" rx="24" fill="#fff" filter="url(#shadow)"/>
+    <circle cx="62" cy="58" r="30" fill="#168b85"/><text x="53" y="68" class="num">3</text>
+    <text x="110" y="66" class="step">管理档期并记录收入</text>
+    <text x="110" y="108" class="body">档期页左右滑换日期；实际收到钱后，在“收入”点击“记一笔”。</text>
+    <text x="110" y="146" class="tiny">今日、本周、本月显示实际到账；订单预计总额不会自动计入收入。</text>
+  </g>
+
+  <g transform="translate(60 996)">
+    <rect width="960" height="238" rx="24" fill="#fff" filter="url(#shadow)"/>
+    <circle cx="62" cy="58" r="30" fill="#ff8427"/><text x="53" y="68" class="num">4</text>
+    <text x="110" y="66" class="step">每天导出备份</text>
+    <text x="110" y="108" class="body">设置 → 导出备份 → 保存到“下载”或发送到自己的电脑。</text>
+    <text x="110" y="146" class="body">订单和收入一起备份；换手机时选择“合并导入”JSON。</text>
+    <rect x="110" y="170" width="790" height="44" rx="10" fill="#fff1c9"/>
+    <text x="130" y="200" class="warn">卸载 App 或清除应用数据前，必须先导出备份。</text>
+  </g>
+
+  <g transform="translate(60 1264)">
+    <rect width="960" height="252" rx="24" fill="#19415f" filter="url(#shadow)"/>
+    <text x="36" y="54" style="font:800 28px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#fff">数据会不会丢？</text>
+    <circle cx="50" cy="100" r="7" fill="#76d8c8"/><text x="74" y="109" style="font:400 22px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#e9f7f3">退出 App、关机、重启：数据保留。</text>
+    <circle cx="50" cy="146" r="7" fill="#76d8c8"/><text x="74" y="155" style="font:400 22px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#e9f7f3">同签名新版直接覆盖安装：数据保留。</text>
+    <circle cx="50" cy="192" r="7" fill="#ffb04f"/><text x="74" y="201" style="font:700 22px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#fff">卸载、清除数据、恢复出厂：本机订单删除。</text>
+    <text x="36" y="232" style="font:400 18px 'Microsoft YaHei','PingFang SC',sans-serif;fill:#a9c9d3">离线版没有服务器副本，JSON 备份是恢复数据的可靠方式。</text>
+  </g>
+
+  <g transform="translate(60 1550)">
+    <rect width="960" height="212" rx="24" fill="#fff" filter="url(#shadow)"/>
+    <text x="34" y="52" class="step">记住这 3 件事</text>
+    <rect x="34" y="77" width="274" height="94" rx="16" fill="#fff4df"/>
+    <text x="54" y="116" class="warn">不需要联网</text><text x="54" y="148" class="tiny">没有网络权限</text>
+    <rect x="342" y="77" width="274" height="94" rx="16" fill="#e4f5f0"/>
+    <text x="362" y="116" class="warn">不会自动同步</text><text x="362" y="148" class="tiny">手机各存各的</text>
+    <rect x="650" y="77" width="276" height="94" rx="16" fill="#e6f0f8"/>
+    <text x="670" y="116" class="warn">每天备份一次</text><text x="670" y="148" class="tiny">保管好 JSON 文件</text>
+  </g>
+
+  <text x="540" y="1840" text-anchor="middle" class="sub">详细步骤请看《先读我-安卓App安装与使用说明》</text>
+</svg>

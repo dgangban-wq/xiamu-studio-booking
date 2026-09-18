@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>夏暮工作室摄影棚预约 App 图文说明书</title>
+    <style>
+      :root {
+        --bg: #f5fbf4;
+        --paper: #fffdf7;
+        --text: #19415f;
+        --muted: #718997;
+        --orange: #ff8427;
+        --blue: #348fbd;
+        --teal: #168b85;
+        --sand: #fff4cc;
+        --sea: #dff4f0;
+        --line: rgba(42, 117, 143, 0.16);
+        --shadow: 0 20px 55px rgba(31, 91, 122, 0.13);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        background:
+          linear-gradient(180deg, rgba(255, 253, 247, 0.96), rgba(245, 251, 244, 0.88) 42%, rgba(223, 244, 240, 0.72)),
+          linear-gradient(128deg, rgba(255, 132, 39, 0.14) 0 18%, transparent 44%),
+          linear-gradient(236deg, rgba(52, 143, 189, 0.2) 0 16%, transparent 48%),
+          var(--bg);
+        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      main {
+        width: min(100%, 980px);
+        margin: 0 auto;
+        padding: 24px 16px 72px;
+      }
+
+      .hero,
+      .panel,
+      .mini-phone,
+      .step,
+      .rule,
+      .backup-card {
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.86);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 132px 1fr;
+        gap: 20px;
+        align-items: center;
+        padding: 20px;
+        overflow: hidden;
+      }
+
+      .logo {
+        width: 132px;
+        height: 132px;
+        object-fit: cover;
+        background: #fff;
+        border: 8px solid #fff;
+        border-radius: 30px;
+        box-shadow: 0 16px 34px rgba(22, 139, 133, 0.18);
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 2px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 38px;
+        line-height: 1.12;
+      }
+
+      .hero p:last-child {
+        margin-top: 12px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 18px 0;
+      }
+
+      .nav a,
+      .back {
+        min-height: 42px;
+        padding: 10px 14px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--orange), #f3a94e);
+        border-radius: 14px;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      section {
+        margin-top: 18px;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .section-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 16px;
+      }
+
+      .section-title span {
+        color: var(--orange);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+      }
+
+      h2 {
+        font-size: 26px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .step {
+        position: relative;
+        padding: 18px;
+        min-height: 180px;
+      }
+
+      .num {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        color: #fff;
+        background: var(--orange);
+        border-radius: 50%;
+        font-weight: 900;
+        box-shadow: 0 12px 24px rgba(255, 132, 39, 0.24);
+      }
+
+      .step h3,
+      .rule h3,
+      .backup-card h3 {
+        margin-top: 14px;
+        font-size: 19px;
+      }
+
+      .step p,
+      .rule p,
+      .backup-card p,
+      li {
+        margin-top: 10px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .mini-phone {
+        padding: 16px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(223, 244, 240, 0.76)),
+          #fff;
+      }
+
+      .phone-top {
+        display: grid;
+        grid-template-columns: 62px 1fr;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .phone-logo {
+        width: 62px;
+        height: 62px;
+        object-fit: cover;
+        border: 5px solid #fff;
+        border-radius: 18px;
+      }
+
+      .mock-tabs,
+      .mock-fields,
+      .mock-summary {
+        margin-top: 14px;
+      }
+
+      .mock-tabs {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+      }
+
+      .mock-tabs span,
+      .field-block,
+      .mock-summary,
+      .timeline-row {
+        background: rgba(255, 255, 255, 0.76);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+
+      .mock-tabs span {
+        padding: 9px 4px;
+        text-align: center;
+        font-size: 12px;
+      }
+
+      .mock-tabs span:first-child {
+        color: #fff;
+        background: var(--orange);
+      }
+
+      .mock-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .field-block {
+        min-height: 44px;
+        padding: 12px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .mock-summary {
+        padding: 16px;
+      }
+
+      .mock-summary strong {
+        display: block;
+        color: var(--orange);
+        font-size: 34px;
+      }
+
+      .rules {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .rule {
+        padding: 16px;
+        min-height: 160px;
+      }
+
+      .rule-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--sea), var(--sand));
+        border: 1px solid rgba(255, 255, 255, 0.8);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border-radius: 18px;
+      }
+
+      th,
+      td {
+        padding: 13px 12px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+      }
+
+      th {
+        color: var(--text);
+        background: rgba(223, 244, 240, 0.72);
+      }
+
+      td {
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.62);
+      }
+
+      .timeline {
+        display: grid;
+        gap: 10px;
+      }
+
+      .timeline-row {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 12px;
+        padding: 13px;
+        align-items: center;
+      }
+
+      .timeline-row strong {
+        color: var(--orange);
+      }
+
+      .backup-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .backup-card {
+        padding: 18px;
+      }
+
+      .tip {
+        padding: 16px;
+        color: #8b511c;
+        background: rgba(255, 244, 204, 0.76);
+        border: 1px solid rgba(255, 132, 39, 0.2);
+        border-radius: 18px;
+        line-height: 1.7;
+      }
+
+      @media (max-width: 760px) {
+        .hero,
+        .grid,
+        .steps,
+        .rules,
+        .backup-grid {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 30px;
+        }
+
+        .timeline-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <img class="logo" src="./logo.jpg" alt="夏暮工作室 Logo" />
+        <div>
+          <p class="eyebrow">XIAMU STUDIO GUIDE</p>
+          <h1>夏暮工作室摄影棚预约 App 图文说明书</h1>
+          <p>适合第一次使用的朋友。照着这份手册操作，就能完成预约、档期、实际收入、改签和备份管理。</p>
+        </div>
+      </header>
+
+      <nav class="nav">
+        <a href="./夏暮工作室预约App-双击打开.html">打开 App</a>
+        <a href="./一图流使用介绍.svg">查看一图流</a>
+        <a href="./文字版使用说明.html">文字版说明</a>
+      </nav>
+
+      <section class="grid">
+        <div class="mini-phone">
+          <div class="phone-top">
+            <img class="phone-logo" src="./logo.jpg" alt="" />
+            <div>
+              <strong>夏暮工作室摄影棚预约</strong>
+              <p>本机离线保存</p>
+            </div>
+          </div>
+          <div class="mock-tabs">
+            <span>预约</span><span>订单</span><span>档期</span><span>收入</span><span>设置</span>
+          </div>
+          <div class="mock-fields">
+            <div class="field-block">场景：教室</div>
+            <div class="field-block">日期：今天</div>
+            <div class="field-block">开始：10:00</div>
+            <div class="field-block">结束：12:00</div>
+          </div>
+          <div class="mock-summary">
+            <span>预计总金额</span>
+            <strong>¥360</strong>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div class="section-title">
+            <div>
+              <span>First Read</span>
+              <h2>先记住三件事</h2>
+            </div>
+          </div>
+          <ol>
+            <li>这是离线单机版，订单和收入只保存在当前设备。</li>
+            <li>关机或关闭页面一般不会丢数据；换设备前必须导出备份。</li>
+            <li>不同设备不会自动同步，需要导出备份后再导入。</li>
+          </ol>
+          <p class="tip">建议每天营业结束后导出一次备份，发到微信文件助手或网盘。</p>
+        </section>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <div>
+            <span>Workflow</span>
+            <h2>日常使用流程</h2>
+          </div>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <div class="num">1</div>
+            <h3>看档期</h3>
+            <p>客户咨询时，先进入“档期”，选择日期，看每个场景当天是否空闲。</p>
+          </article>
+          <article class="step">
+            <div class="num">2</div>
+            <h3>填预约</h3>
+            <p>进入“预约”，选择场景、日期、时间和人数，填写客户姓名、手机号、微信号。</p>
+          </article>
+          <article class="step">
+            <div class="num">3</div>
+            <h3>确认费用</h3>
+            <p>系统会实时计算基础费、加班费、超人费、总金额和订金。</p>
+          </article>
+          <article class="step">
+            <div class="num">4</div>
+            <h3>保存订单</h3>
+            <p>点击“保存预约”。如果撞档或不足 2 小时，系统会阻止保存。</p>
+          </article>
+          <article class="step">
+            <div class="num">5</div>
+            <h3>改状态</h3>
+            <p>收到订金后，在“订单”里把状态改成“已付订金”；拍完后改为“已完工”。</p>
+          </article>
+          <article class="step">
+            <div class="num">6</div>
+            <h3>记实际收入</h3>
+            <p>真正收到钱后进入“收入”点“记一笔”。可关联订单，并查看今日、本周和本月实收。</p>
+          </article>
+          <article class="step">
+            <div class="num">7</div>
+            <h3>导出备份</h3>
+            <p>每天结束后进入“设置”导出 json，订单和收入会一起备份。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <div>
+            <span>Rules</span>
+            <h2>系统自动处理的规则</h2>
+          </div>
+        </div>
+        <div class="rules">
+          <article class="rule">
+            <div class="rule-icon"></div>
+            <h3>2 小时起租</h3>
+            <p>预约不足 2 小时无法保存。</p>
+          </article>
+          <article class="rule">
+            <div class="rule-icon"></div>
+            <h3>30 分钟粒度</h3>
+            <p>开始和结束时间按半小时选择。</p>
+          </article>
+          <article class="rule">
+            <div class="rule-icon"></div>
+            <h3>紧邻档期提醒</h3>
+            <p>15 分钟收尾不占档；前后单相隔不足 15 分钟时醒目提醒。</p>
+          </article>
+          <article class="rule">
+            <div class="rule-icon"></div>
+            <h3>改签计数</h3>
+            <p>只有日期或起止时间变化才计为改签；只改人数不计次。第二次及以后改签会提示加收 50 元。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <div>
+            <span>Price</span>
+            <h2>场景价格表</h2>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>场景</th>
+              <th>工作日</th>
+              <th>节假日</th>
+              <th>限人数</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>教室</td><td>180/h</td><td>210/h</td><td>6 人</td></tr>
+            <tr><td>书房</td><td>150/h</td><td>180/h</td><td>4 人</td></tr>
+            <tr><td>白棚</td><td>120/h</td><td>150/h</td><td>6 人</td></tr>
+            <tr><td>办公室</td><td>120/h</td><td>150/h</td><td>4 人</td></tr>
+            <tr><td>游戏部</td><td>150/h</td><td>180/h</td><td>6 人</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <div>
+            <span>Anti Conflict</span>
+            <h2>撞档与紧邻提醒</h2>
+          </div>
+        </div>
+        <div class="timeline">
+          <div class="timeline-row">
+            <strong>已有订单</strong>
+            <span>教室 10:00-12:00</span>
+          </div>
+          <div class="timeline-row">
+            <strong>会被拦截</strong>
+            <span>教室 11:00-13:00，因为时间重叠。</span>
+          </div>
+          <div class="timeline-row">
+            <strong>可以保存并提醒</strong>
+            <span>教室 12:00-14:00，系统标记“紧邻档期”，提醒棚主联系下一单客户。</span>
+          </div>
+          <div class="timeline-row">
+            <strong>更从容的安排</strong>
+            <span>教室 12:30-14:30，留出清场、换景和客户交接时间。</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <div>
+            <span>Backup</span>
+            <h2>备份与换手机</h2>
+          </div>
+        </div>
+        <div class="backup-grid">
+          <article class="backup-card">
+            <div class="num">1</div>
+            <h3>导出备份</h3>
+            <p>进入“设置”，点击“导出备份”，保存生成的 json 文件。</p>
+          </article>
+          <article class="backup-card">
+            <div class="num">2</div>
+            <h3>发送文件</h3>
+            <p>把备份文件发到微信文件助手、网盘或电脑。</p>
+          </article>
+          <article class="backup-card">
+            <div class="num">3</div>
+            <h3>导入恢复</h3>
+            <p>新设备打开 App 后选择“合并导入”。订单、收入和日期规则会一起恢复，无效数据会自动跳过。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <div>
+            <span>FAQ</span>
+            <h2>常见问题</h2>
+          </div>
+        </div>
+        <div class="timeline">
+          <div class="timeline-row">
+            <strong>电脑关机会丢订单吗？</strong>
+            <span>不会。订单保存在手机本地，电脑关机不影响手机里已经保存的订单。</span>
+          </div>
+          <div class="timeline-row">
+            <strong>手机和电脑会同步吗？</strong>
+            <span>不会。离线版每台设备各存各的，需要导出/导入备份。</span>
+          </div>
+          <div class="timeline-row">
+            <strong>导入会覆盖订单吗？</strong>
+            <span>默认“合并导入”不会覆盖。只有选择“覆盖导入”才会替换本机数据。</span>
+          </div>
+          <div class="timeline-row">
+            <strong>订单有金额，为什么收入还是 0？</strong>
+            <span>订单金额是预计应收。只有在“收入”中保存的实际收款，才进入日、周、月统计。</span>
+          </div>
+        </div>
+      </section>
+
+      <p style="margin-top:18px">
+        <a class="back" href="./夏暮工作室预约App-双击打开.html">返回 App</a>
+      </p>
+    </main>
+  </body>
+</html>

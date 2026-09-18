@@ -1,0 +1,29 @@
+{
+  "description": "夏暮工作室预约管理系统",
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "web-admin"
+      },
+      {
+        "type": "folder",
+        "value": "tests"
+      }
+    ]
+  },
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "latest",
+  "appid": "touristappid",
+  "projectname": "xiamu-studio-booking",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "miniprogramRoot": "miniprogram/"
+}

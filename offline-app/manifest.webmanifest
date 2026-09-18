@@ -1,0 +1,17 @@
+{
+  "name": "夏暮工作室离线预约",
+  "short_name": "夏暮摄影棚预约",
+  "start_url": "./夏暮工作室预约App-双击打开.html",
+  "display": "standalone",
+  "background_color": "#f7fbef",
+  "theme_color": "#f7fbef",
+  "description": "夏暮工作室本地离线预约管理工具",
+  "icons": [
+    {
+      "src": "./logo.jpg",
+      "sizes": "640x640",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

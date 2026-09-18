@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/booking/booking",
+    "pages/admin/admin"
+  ],
+  "window": {
+    "navigationBarTitleText": "夏暮工作室",
+    "navigationBarBackgroundColor": "#08090d",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#08090d",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

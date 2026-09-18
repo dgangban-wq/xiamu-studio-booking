@@ -1,0 +1,289 @@
+:root {
+  color: #f6f0e8;
+  background: #08090d;
+  font-family: "Aptos Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 1100px;
+  min-height: 100vh;
+  background:
+    linear-gradient(140deg, rgba(255, 138, 42, 0.16), transparent 28%),
+    linear-gradient(260deg, rgba(58, 166, 255, 0.14), transparent 30%),
+    #08090d;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: 100vh;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 36px;
+  background: rgba(6, 7, 10, 0.82);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: #ff8a2a;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+h1 {
+  margin: 0;
+  color: #fff7ec;
+  font-size: 42px;
+  line-height: 1.05;
+}
+
+.metric {
+  margin-top: 18px;
+  padding: 22px;
+  background: #101219;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.metric span {
+  display: block;
+  color: #9298a5;
+  font-size: 13px;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 8px;
+  color: #f6f0e8;
+  font-size: 34px;
+}
+
+.metric.accent strong {
+  color: #ff8a2a;
+}
+
+.workspace {
+  padding: 32px;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: 160px 160px 160px 1fr 110px;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 22px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: #9298a5;
+  font-size: 13px;
+}
+
+input,
+select {
+  height: 42px;
+  padding: 0 12px;
+  color: #f6f0e8;
+  background: #0c1018;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: #3aa6ff;
+}
+
+button {
+  height: 42px;
+  color: #0a0a0d;
+  background: #ff8a2a;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.message {
+  white-space: pre-line;
+  padding: 14px 16px;
+  background: rgba(58, 166, 255, 0.13);
+  border: 1px solid rgba(58, 166, 255, 0.25);
+  border-radius: 8px;
+}
+
+.message.error {
+  color: #ffb14a;
+  background: rgba(255, 138, 42, 0.12);
+  border-color: rgba(255, 138, 42, 0.22);
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.lane {
+  min-height: 520px;
+  padding: 16px;
+  background: rgba(16, 18, 25, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.lane header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.lane small {
+  margin-left: auto;
+  color: #9298a5;
+}
+
+.cards {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-card {
+  padding: 14px;
+  background: #0c1018;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.row,
+.fees,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.row span {
+  color: #3aa6ff;
+  font-size: 12px;
+}
+
+h3 {
+  margin: 10px 0 6px;
+  color: #fff7ec;
+}
+
+p {
+  margin: 0;
+  color: #9298a5;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.fees {
+  justify-content: flex-start;
+  margin-top: 12px;
+  color: #ffb14a;
+  font-size: 12px;
+}
+
+.actions {
+  justify-content: flex-start;
+  margin-top: 12px;
+}
+
+.actions button,
+.dialog header button {
+  width: auto;
+  height: 32px;
+  padding: 0 10px;
+  color: #f6f0e8;
+  background: #151b26;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+}
+
+.actions button.warn {
+  color: #ff8a2a;
+}
+
+.empty {
+  display: grid;
+  min-height: 120px;
+  place-items: center;
+  color: #606876;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.dialog {
+  width: 420px;
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  background: #101219;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.dialog header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialog h2 {
+  margin: 0;
+}
+
+.primary {
+  margin-top: 4px;
+}

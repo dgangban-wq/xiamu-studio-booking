@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">夏暮工作室摄影棚预约</string>
+    <string name="title_activity_main">夏暮工作室摄影棚预约</string>
+    <string name="package_name">com.xiamustudio.booking</string>
+    <string name="custom_url_scheme">com.xiamustudio.booking</string>
+</resources>

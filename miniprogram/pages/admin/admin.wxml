@@ -1,0 +1,110 @@
+<view class="page">
+  <view class="header">
+    <view>
+      <text class="eyebrow">ADMIN CONSOLE</text>
+      <view class="title">档期管理</view>
+    </view>
+    <button class="ghost" size="mini" bindtap="loadBookings">刷新</button>
+  </view>
+
+  <view class="filters">
+    <view class="field">
+      <text class="label">日期</text>
+      <picker mode="date" value="{{filters.date}}" bindchange="onDateChange">
+        <view class="picker">{{filters.date || '全部日期'}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <text class="label">场景</text>
+      <picker range="{{sceneFilterOptions}}" range-key="name" value="{{sceneFilterIndex}}" bindchange="onSceneFilterChange">
+        <view class="picker">{{sceneFilterOptions[sceneFilterIndex].name}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <text class="label">状态</text>
+      <picker range="{{statusFilterOptions}}" range-key="label" value="{{statusFilterIndex}}" bindchange="onStatusFilterChange">
+        <view class="picker">{{statusFilterOptions[statusFilterIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="field search">
+      <text class="label">姓名 / 手机</text>
+      <input class="input" value="{{filters.keyword}}" bindinput="onKeywordInput" confirm-type="search" bindconfirm="loadBookings" />
+    </view>
+    <button class="search-btn" bindtap="loadBookings">搜索</button>
+  </view>
+
+  <view wx:if="{{error}}" class="error">{{error}}</view>
+
+  <view class="summary">
+    <view>
+      <text class="big">{{bookings.length}}</text>
+      <text class="muted">条订单</text>
+    </view>
+    <view>
+      <text class="big price">¥{{summary.total}}</text>
+      <text class="muted">预计收入</text>
+    </view>
+  </view>
+
+  <view class="booking-list">
+    <view wx:for="{{bookings}}" wx:key="_id" class="booking">
+      <view class="booking-main">
+        <view>
+          <view class="scene">{{item.scene_name}} · {{item.customer_name}}</view>
+          <view class="time">{{item.date}} {{item.start_time}}-{{item.end_time}} · {{item.people_count}}人</view>
+          <view class="contact">{{item.phone}} / {{item.wechat}}</view>
+        </view>
+        <view class="amount">
+          <view>¥{{item.total_display}}</view>
+          <text>{{item.status_label}}</text>
+        </view>
+      </view>
+
+      <view class="meta">
+        <text>订金 ¥{{item.deposit_display}}</text>
+        <text>改签 {{item.change_count || 0}} 次</text>
+        <text wx:if="{{item.reschedule_fee > 0}}" class="price">改签费 ¥{{item.reschedule_fee}}</text>
+      </view>
+
+      <view class="actions">
+        <picker range="{{statusOptions}}" range-key="label" data-id="{{item._id}}" bindchange="onStatusChange">
+          <view class="action blue">改状态</view>
+        </picker>
+        <view class="action" data-id="{{item._id}}" bindtap="startEdit">改签</view>
+        <view class="action cancel" data-id="{{item._id}}" data-status="cancelled" bindtap="quickStatus">取消</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{editing}}" class="editor">
+    <view class="editor-head">
+      <text>订单改签</text>
+      <text class="close" bindtap="cancelEdit">关闭</text>
+    </view>
+    <view class="grid">
+      <view class="field">
+        <text class="label">日期</text>
+        <picker mode="date" value="{{editForm.date}}" bindchange="onEditDateChange">
+          <view class="picker">{{editForm.date}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <text class="label">人数</text>
+        <input class="input" type="number" value="{{editForm.people_count}}" bindinput="onEditPeopleInput" />
+      </view>
+      <view class="field">
+        <text class="label">开始</text>
+        <picker range="{{timeSlots}}" value="{{editStartIndex}}" bindchange="onEditStartChange">
+          <view class="picker">{{editForm.start_time}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <text class="label">结束</text>
+        <picker range="{{timeSlots}}" value="{{editEndIndex}}" bindchange="onEditEndChange">
+          <view class="picker">{{editForm.end_time}}</view>
+        </picker>
+      </view>
+    </view>
+    <button class="save" loading="{{saving}}" bindtap="saveEdit">保存改签</button>
+  </view>
+</view>
