@@ -105,7 +105,7 @@ tests/                              自动化测试
 
 ---
 
-## 四、给朋友使用安卓 App
+## 四、使用安卓 App
 
 1. 将 `安卓安装包/夏暮工作室摄影棚预约-v1.2.apk` 发送到安卓手机。
 2. 点击 APK 安装；如系统提示允许安装未知来源应用，请按手机提示允许。
@@ -300,35 +300,9 @@ GitHub Actions 会在提交或合并请求时自动运行测试和 Web 构建。
 
 当前规则是：15 分钟收尾时间不占用档期。实际预约时间不重叠时可以保存，但会显示紧邻档期提醒，棚主需要提醒下一单客户提前候场，并提醒上一单客户准时收尾。
 
-### 如何换手机？
+### 换手机如何处理？
 
 旧手机进入“设置”导出 JSON；新手机安装 App 后进入“设置”，选择“合并导入”。导入前建议保留一份原始备份文件。
-
----
-
-## 十、提交到 GitHub
-
-本项目当前远程仓库：
-
-```text
-https://github.com/dgangban-wq/xiamu-studio-booking
-```
-
-修改文件后，在项目目录打开 PowerShell：
-
-```bash
-git status
-git add README.md
-git commit -m "整理项目说明和版本更新记录"
-git push origin main
-```
-
-不要提交以下内容：
-
-- `android-app/android/keystore.properties`
-- 真实安卓签名私钥和密码。
-- Android SDK、JDK 和构建缓存。
-- 含有私密信息的备份文件。
 
 ---
 
