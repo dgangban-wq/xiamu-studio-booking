@@ -1,4 +1,3 @@
-<img width="1254" height="1254" alt="Codex 图像 2026年9月22日 16_52_11" src="https://github.com/user-attachments/assets/1bd57bed-2742-4109-9b6d-6fbe00430cd4" />
 # 摄影棚预约管理
 
 **给摄影棚主使用的离线预约与记账工具。** 支持自定义工作室名称、Logo、置景和收费规则，提供安卓 App 和电脑网页版。无需账号、服务器或月费。
