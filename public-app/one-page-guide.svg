@@ -37,7 +37,7 @@
     <rect x="104" y="104" width="150" height="150" rx="32" fill="none" stroke="#ffffff" stroke-width="12"/>
     <text x="286" y="130" class="eyebrow">STUDIO BOOKING</text>
     <text x="286" y="195" class="title">摄影棚预约管理</text>
-    <text x="286" y="246" class="sub">公开版 1.0 · 离线保存 · 实收记账</text>
+    <text x="286" y="246" class="sub">公开版 1.1.0 · 离线保存 · 实收记账</text>
   </g>
 
   <g transform="translate(70 365)">
@@ -58,8 +58,8 @@
 
     <g transform="translate(52 205)">
       <circle cx="34" cy="34" r="34" fill="url(#sea)"/><text x="24" y="45" class="num">2</text>
-      <text x="92" y="31" class="h">填写预约</text>
-      <text x="92" y="70" class="p">先查看档期，再选择场景、时间、人数并填写客户信息。</text>
+      <text x="92" y="31" class="h">工作台与快捷预约</text>
+      <text x="92" y="70" class="p">从日周档期点空档，按选档期、填客户、确认金额建单。</text>
     </g>
 
     <path d="M86 295 L86 337" stroke="#d6e9e6" stroke-width="8" stroke-linecap="round"/>
@@ -74,8 +74,8 @@
 
     <g transform="translate(52 499)">
       <circle cx="34" cy="34" r="34" fill="url(#sea)"/><text x="24" y="45" class="num">4</text>
-      <text x="92" y="31" class="h">保存订单</text>
-      <text x="92" y="70" class="p">真实时间重叠会拦截；首尾紧接可保存，并醒目提醒下一单客户。</text>
+      <text x="92" y="31" class="h">保存并分享确认单</text>
+      <text x="92" y="70" class="p">撞档拦截，收尾仅提醒；订单详情可预览并分享确认单。</text>
     </g>
 
     <path d="M86 589 L86 631" stroke="#d6e9e6" stroke-width="8" stroke-linecap="round"/>
@@ -83,7 +83,7 @@
     <g transform="translate(52 646)">
       <circle cx="34" cy="34" r="34" fill="url(#sun)"/><text x="24" y="45" class="num">5</text>
       <text x="92" y="31" class="h">管理状态并记收入</text>
-      <text x="92" y="70" class="p">收到钱后进“收入”记账，可查看今日、本周和本月实际收入。</text>
+      <text x="92" y="70" class="p">实际到账后记账；部分退款、作废留痕，日周月看净收款。</text>
     </g>
   </g>
 
@@ -102,5 +102,5 @@
     <text x="42" y="145" class="p">手机关机、关闭浏览器一般不会丢；清缓存、换手机前必须先备份。</text>
   </g>
 
-  <text x="70" y="1866" class="small">摄影棚预约管理 · 公开版 1.0 · 详细说明见 使用说明.html</text>
+  <text x="70" y="1866" class="small">摄影棚预约管理 · 公开版 1.1.0 · 详细说明见 使用说明.html</text>
 </svg>

@@ -1,6 +1,6 @@
 # Public Android build
 
-Independent package `com.studiobooking.publicapp`, version `1.0.2` / code `3`.
+Independent package `com.studiobooking.publicapp`, version `1.1.0` / code `4`.
 Includes the offline author contact dialog and original QR image.
 Requires the existing `.android-tools` JDK 21 and Android SDK 36. Source does not
 depend on `android-app`, its artwork, its credentials, or customer data.

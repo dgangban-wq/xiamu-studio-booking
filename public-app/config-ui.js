@@ -10,7 +10,7 @@
   dialog.className = 'config-dialog';
   dialog.setAttribute('aria-labelledby', 'configTitle');
   dialog.innerHTML = `<form id="studioConfigForm" novalidate>
-    <header class="config-header"><div><small>STUDIO BOOKING · 公开版 1.0.2</small><h2 id="configTitle">工作室配置</h2></div><button id="configClose" type="button" class="plain-icon" title="关闭配置" aria-label="关闭配置"><i data-lucide="x"></i></button></header>
+    <header class="config-header"><div><small>STUDIO BOOKING · 公开版 1.1.0</small><h2 id="configTitle">工作室配置</h2></div><button id="configClose" type="button" class="plain-icon" title="关闭配置" aria-label="关闭配置"><i data-lucide="x"></i></button></header>
     <nav class="config-steps" aria-label="配置步骤"><button type="button" data-config-step="0">1 工作室</button><button type="button" data-config-step="1">2 场景</button><button type="button" data-config-step="2">3 预约规则</button></nav>
     <div id="configErrors" class="config-errors" role="alert" tabindex="-1" hidden></div>
     <div id="configBody" class="config-body"></div>
@@ -89,11 +89,11 @@
     box.textContent = messages.join('；');
     if (messages.length) box.focus();
   }
-  function open() {
+  function open(initialStep = 0) {
     if (!window.PublicStudio || dialog.open) return;
     original = clone(window.PublicStudio.getConfig());
     draft = clone(original);
-    step = 0;
+    step = Number.isInteger(initialStep) && initialStep >= 0 && initialStep <= 2 ? initialStep : 0;
     errors([]); render(); dialog.showModal(); openedOnce = true;
   }
   function close() {
@@ -186,7 +186,8 @@
     finally { saving = false; $('configSave').disabled = false; }
   });
   window.addEventListener('beforeunload', (e) => { if (dialog.open && dirty()) { e.preventDefault(); e.returnValue = ''; } });
-  $('openStudioConfig').addEventListener('click', open);
+  $('openStudioConfig').addEventListener('click', () => open());
+  document.querySelectorAll('[data-open-config]').forEach(button => button.addEventListener('click', () => open(Number(button.dataset.openConfig))));
   const recovery = document.createElement('section');
   recovery.id = 'configRecovery'; recovery.className = 'config-recovery'; recovery.hidden = true;
   recovery.setAttribute('role','alertdialog'); recovery.setAttribute('aria-modal','true'); recovery.setAttribute('aria-label','本机数据恢复'); recovery.tabIndex = -1;
@@ -223,10 +224,10 @@
     document.documentElement.style.setProperty('--teal', themes[p.theme] || themes.teal);
     $('studioName').textContent = p.name || '摄影棚预约管理';
     $('settingsStudioName').textContent = p.name || '摄影棚预约管理';
-    $('studioContact').textContent = [p.phone, p.wechat && `微信 ${p.wechat}`, p.address].filter(Boolean).join(' · ') || '公开版 1.0.2';
+    $('studioContact').textContent = [p.phone, p.wechat && `微信 ${p.wechat}`, p.address].filter(Boolean).join(' · ') || '公开版 1.1.0';
     document.querySelectorAll('.brand-logo, .about-version-row img').forEach((img) => { img.src = p.logo || './icon.png'; });
-    document.title = `${p.name || '摄影棚预约管理'} · 公开版 1.0.2`;
-    $('appVersion').textContent = '公开版 1.0.2';
+    document.title = `${p.name || '摄影棚预约管理'} · 公开版 1.1.0`;
+    $('appVersion').textContent = '公开版 1.1.0';
     $('studioNotice').textContent = p.notice || '暂无工作室公告。';
     $('studioRuleSummary').textContent = `营业时间 ${r.open}–${r.close}；${r.minMinutes} 分钟起约；收尾提醒间隔 ${r.turnaroundMinutes} 分钟；免费改签 ${r.freeChanges} 次，超出后每次 ¥${r.changeFee}。`;
     $('configSummary').textContent = `${config.scenes.filter((s) => s.active).length} 个启用场景 · ${r.open}–${r.close}`;

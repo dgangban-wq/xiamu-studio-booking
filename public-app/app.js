@@ -114,8 +114,7 @@ function getIncomeRecordsInPeriod(records, anchorDate, period) {
 
 function summarizeIncome(records, anchorDate = today()) {
   const safeRecords = (Array.isArray(records) ? records : []).map(normalizeIncomeRecord).filter(Boolean);
-  const total = (period) => Math.round(getIncomeRecordsInPeriod(safeRecords, anchorDate, period)
-    .reduce((sum, record) => sum + record.amount, 0) * 100) / 100;
+  const total = (period) => financeTotals(getIncomeRecordsInPeriod(safeRecords, anchorDate, period)).net;
   return { day: total('day'), week: total('week'), month: total('month') };
 }
 
@@ -229,11 +228,16 @@ async function importBackup(raw, mode = 'merge') {
       }
       const incomes = mode==='replace'?[]:[...latest.incomes];
       for (const incoming of data.incomes) {
-        const candidate = {...incoming,booking_id:bookingMap.get(incoming.booking_id)||''};
+        const candidate = {...incoming};
         const same = incomes.find(i=>i.id===candidate.id);
-        if(same) {report.skippedIncomes++;continue;}
+        if(same) {
+          const fields = ['date','amount','category','booking_id','kind','refund_of','reason','voided_at','void_reason','customer_name','note','payment_method'];
+          if(fields.some(key=>same[key]!==candidate[key])) return {ok:false,errors:['同 ID 财务记录内容冲突，未导入任何记录']};
+          report.skippedIncomes++;continue;
+        }
         incomes.push(candidate);
       }
+      if (!validateFinance(incomes, bookings)) return {ok:false,errors:['退款关联或累计金额无效，未导入任何记录']};
       const holidays = new Map((mode==='replace'?[]:latest.holidays).map(h=>[h.date,h]));
       data.holidays.forEach(h=>{if(mode==='replace'||!holidays.has(h.date)) holidays.set(h.date,h);});
       return {ok:true,report,state:{...latest,config,bookings,incomes,holidays:[...holidays.values()]}};
@@ -249,6 +253,9 @@ window.PublicStudio = {
   saveConfig, refresh:refreshPublic,
   resetSetup:()=>saveConfig({...state.config,configured:false}),
   importBackup,
+  financeSummary: (bookingId) => financeSummary(bookingId),
+  createRefund, voidIncome,
+  summarizeIncome,
   exportBackup:()=>window.PublicConfig.clone(state)
 };
 Object.assign(window.PublicStudio, {
@@ -298,6 +305,7 @@ function normalizeState(input) {
     if(source[key]!==undefined && (!Array.isArray(source[key]) || source[key].length!==records.length)) throw Error(`无效 ${key} 数据，原始记录已保留`);
     if(key!=='holidays' && new Set(records.map(r=>r.id)).size!==records.length) throw Error(`重复 ${key} ID，原始记录已保留`);
   }
+  if (!validateFinance(incomes, normalizedBookings)) throw Error('财务关联或退款金额无效，原始记录已保留');
   return {
     version: 2,
     config: window.PublicConfig.clone(config),
@@ -658,7 +666,7 @@ function createIncomeAtomically(input) {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     });
-    if (!record) return { ok: false, reason: 'invalid' };
+    if (!record || record.voided_at || !validateFinance([...latest.incomes, record], latest.bookings)) return { ok: false, reason: 'invalid' };
     return {
       ok: true,
       state: { ...latest, incomes: [...latest.incomes, record] },
@@ -667,13 +675,34 @@ function createIncomeAtomically(input) {
   });
 }
 
-function deleteIncomeAtomically(id) {
-  return mutateStateAtomically((latest) => {
-    const incomes = latest.incomes.filter((record) => record.id !== id);
-    if (incomes.length === latest.incomes.length) return { ok: false, reason: 'missing' };
-    return { ok: true, state: { ...latest, incomes } };
+function createRefund(receiptId, input = {}) {
+  if (typeof receiptId === 'object' && receiptId) { input = receiptId; receiptId = input.refund_of; }
+  return mutateStateAtomically(latest => {
+    const receipt = latest.incomes.find(record => record.id === receiptId);
+    if (!receipt || receipt.kind !== 'receipt' || receipt.voided_at) return {ok:false,reason:'invalid'};
+    if (input.booking_id !== undefined && input.booking_id !== receipt.booking_id) return {ok:false,reason:'invalid'};
+    const record = normalizeIncomeRecord({...input,id:uid(),kind:'refund',refund_of:receipt.id,
+      booking_id:receipt.booking_id,category:receipt.category,customer_name:receipt.customer_name,
+      payment_method:input.payment_method ?? receipt.payment_method,created_at:new Date().toISOString(),updated_at:new Date().toISOString()});
+    if (!record || record.voided_at || !validateFinance([...latest.incomes,record],latest.bookings)) return {ok:false,reason:'invalid'};
+    return {ok:true,income:record,state:{...latest,incomes:[...latest.incomes,record]}};
   });
 }
+
+function voidIncome(id, reason) {
+  return mutateStateAtomically((latest) => {
+    const record = latest.incomes.find(record => record.id === id);
+    if (!record) return {ok:false,reason:'missing'};
+    if (typeof reason !== 'string' || !reason.trim() || reason.trim().length > 2000) return {ok:false,reason:'invalid'};
+    if (record.voided_at) return {ok:false,reason:'voided'};
+    if (latest.incomes.some(item => item.refund_of === id && !item.voided_at)) return {ok:false,reason:'active_refunds'};
+    const now = new Date().toISOString();
+    const income = {...record,voided_at:now,void_reason:reason.trim(),updated_at:now};
+    return {ok:true,income,state:{...latest,incomes:latest.incomes.map(item=>item.id===id?income:item)}};
+  });
+}
+
+function deleteIncomeAtomically(id, reason) { return voidIncome(id, reason); }
 
 function updateBookingStatusAtomically(id, status) {
   return mutateStateAtomically((latest) => {
@@ -813,16 +842,26 @@ function normalizeHoliday(raw) {
 
 function normalizeIncomeRecord(raw) {
   if (!raw || typeof raw !== 'object') return null;
-  const amount = Number(raw.amount);
+  const cents = amountCents(raw.amount);
+  const kind = raw.kind === undefined ? 'receipt' : raw.kind;
+  const refundOf = raw.refund_of ?? '';
+  const reason = raw.reason ?? '';
+  const voidedAt = raw.voided_at ?? '';
+  const voidReason = raw.void_reason ?? '';
+  if (!['receipt','refund'].includes(kind) || typeof refundOf !== 'string' || typeof reason !== 'string' || reason.length > 2000) return null;
+  if (kind === 'refund' ? (!window.PublicConfig.safeId(refundOf) || !reason.trim()) : Boolean(refundOf)) return null;
+  if (typeof voidedAt !== 'string' || typeof voidReason !== 'string' || voidReason.length > 2000 || Boolean(voidedAt) !== Boolean(voidReason.trim())) return null;
+  if (voidedAt && !Number.isFinite(Date.parse(voidedAt))) return null;
   const category = String(raw.category || '');
   if (!isDate(String(raw.date || ''))) return null;
-  if (!Number.isFinite(amount) || amount <= 0 || amount > 10000000) return null;
+  if (cents === null) return null;
   if (!incomeCategories.some(([value]) => value === category)) return null;
   const now = new Date().toISOString();
   return {
     id: String(raw.id || uid()),
     date: String(raw.date),
-    amount: Math.round(amount * 100) / 100,
+    amount: cents / 100,
+    kind, refund_of: refundOf, reason: reason.trim(), voided_at: voidedAt, void_reason: voidReason.trim(),
     category,
     booking_id: String(raw.booking_id || ''),
     customer_name: String(raw.customer_name || '').trim().slice(0, 50),
@@ -831,6 +870,55 @@ function normalizeIncomeRecord(raw) {
     created_at: raw.created_at || now,
     updated_at: raw.updated_at || raw.created_at || now
   };
+}
+
+// Parse decimal currency without rounding sub-cent input or binary arithmetic.
+function amountCents(value) {
+  if (!['number','string'].includes(typeof value)) return null;
+  const text = String(value).trim();
+  if (!/^\d+(?:\.\d{1,2})?$/.test(text)) return null;
+  const [whole, fraction = ''] = text.split('.');
+  const cents = Number(whole) * 100 + Number(fraction.padEnd(2, '0'));
+  return Number.isSafeInteger(cents) && cents > 0 && cents <= 1000000000 ? cents : null;
+}
+
+function validateFinance(records, bookings) {
+  const byId = new Map(records.map(record=>[record.id,record]));
+  if (byId.size !== records.length) return false;
+  const bookingIds = new Set(bookings.map(booking=>booking.id));
+  const refunded = new Map();
+  for (const record of records) {
+    if (record.booking_id && !bookingIds.has(record.booking_id)) return false;
+    if (record.kind !== 'refund') continue;
+    const receipt = byId.get(record.refund_of);
+    if (!receipt || receipt.kind !== 'receipt' || receipt.booking_id !== record.booking_id || record.date < receipt.date) return false;
+    if (record.voided_at) continue;
+    if (receipt.voided_at) return false;
+    const total = (refunded.get(receipt.id) || 0) + amountCents(record.amount);
+    if (total > amountCents(receipt.amount)) return false;
+    refunded.set(receipt.id,total);
+  }
+  return true;
+}
+
+function financeTotals(records) {
+  let gross = 0, refunded = 0;
+  for (const record of records) {
+    if (record.voided_at) continue;
+    const cents = amountCents(record.amount) || 0;
+    if (record.kind === 'refund') refunded += cents;
+    else gross += cents;
+  }
+  return {gross:gross / 100,refunded:refunded / 100,net:(gross - refunded) / 100};
+}
+
+function financeSummary(bookingId) {
+  return financeTotals(state.incomes.filter(record=>bookingId === undefined || record.booking_id === bookingId));
+}
+
+function refundableCents(receipt) {
+  return amountCents(receipt.amount) - state.incomes.filter(record=>record.refund_of === receipt.id && !record.voided_at)
+    .reduce((sum,record)=>sum + amountCents(record.amount),0);
 }
 
 function clearElement(element) {
@@ -1036,11 +1124,12 @@ async function setBookingStatusFromUi(booking, nextStatus, control = null, optio
   if (control) control.disabled = false;
   if (!result.ok) {
     if (result.reason === 'missing') alert('该订单已在另一个窗口中发生变化，请刷新后重试。');
+    else alert(result.reason === 'conflict' ? '恢复订单会与已有档期冲突，请先调整档期。' : '订单状态保存失败，请检查本机存储后重试。');
     return false;
   }
   showToast(`订单已标记为${statusName(nextStatus)}`);
   renderAll();
-  if (nextStatus === 'deposit_paid' && !state.incomes.some((record) => record.booking_id === booking.id && record.category === 'deposit')) {
+  if (nextStatus === 'deposit_paid' && !state.incomes.some((record) => record.booking_id === booking.id && record.category === 'deposit' && record.kind === 'receipt' && !record.voided_at && refundableCents(record) > 0)) {
     const latestBooking = state.bookings.find((item) => item.id === booking.id) || booking;
     if (confirm('订单状态已更新。是否现在把实际收到的订金记入收入？')) openIncomeDialog(latestBooking);
   }
@@ -1056,7 +1145,8 @@ async function cancelBookingFromUi(booking, control = null) {
 function openOrderDetail(booking) {
   const content = $('orderDetailContent');
   clearElement(content);
-  const collected = state.incomes.filter((record) => record.booking_id === booking.id).reduce((sum, record) => sum + record.amount, 0);
+  const finance = financeSummary(booking.id);
+  const collected = finance.net;
   const rows = [
     ['场景', booking.scene_name],
     ['档期', `${booking.date} ${booking.start_time}-${booking.end_time}`],
@@ -1065,7 +1155,7 @@ function openOrderDetail(booking) {
     ['微信号', booking.wechat],
     ['备注', booking.note || '无'],
     ['状态', statusName(booking.status)],
-    ['费用', `总额 ${money(booking.total_fee)} · 已收 ${money(collected)} · 待收 ${money(Math.max(0, booking.total_fee - collected))}`],
+    ['费用', `原订单总额 ${money(booking.total_fee)} · 收款 ${money(finance.gross)} · 退款 ${money(finance.refunded)} · 净收 ${money(collected)}${booking.status === 'cancelled' ? '' : ` · 待收 ${money(Math.max(0, Math.round(booking.total_fee * 100) - Math.round(collected * 100)) / 100)}`}`],
     ['改签', `${booking.change_count || 0} 次`]
   ];
   rows.forEach(([label, value]) => {
@@ -1088,7 +1178,16 @@ function openOrderDetail(booking) {
     });
     content.appendChild(recordButton);
   }
-  $('orderDetailDialog').showModal();
+  state.incomes.filter(record=>record.booking_id===booking.id).forEach(record=> {
+    const row = document.createElement('div');
+    const label = document.createElement('span');
+    label.textContent = `${record.date} · ${record.kind === 'refund' ? '退款' : '收款'}${record.voided_at ? ' · 已作废' : ''} · ${money(record.amount)}${record.reason ? ` · ${record.reason}` : ''}${record.void_reason ? ` · 作废原因：${record.void_reason}` : ''}`;
+    row.appendChild(label);
+    appendFinanceActions(row,record,booking.id);
+    content.appendChild(row);
+  });
+  window.dispatchEvent(new CustomEvent('publicstudio:detail',{detail:{bookingId:booking.id}}));
+  if (!$('orderDetailDialog').open) $('orderDetailDialog').showModal();
   refreshIcons();
 }
 
@@ -1254,7 +1353,7 @@ function renderCalendar() {
   const date = $('calendarDate').value;
   const list = $('calendarList');
   clearElement(list);
-  if(!isDate(date)) {const message=document.createElement('p');message.textContent='请选择有效日期';list.appendChild(message);return;}
+  if(!isDate(date)) {const message=document.createElement('p');message.textContent='请选择有效日期';list.appendChild(message);window.dispatchEvent(new CustomEvent('publicstudio:calendar'));return;}
 
   const ruler = document.createElement('div');
   ruler.className = 'time-ruler';
@@ -1312,6 +1411,7 @@ function renderCalendar() {
     lane.appendChild(track);
     list.appendChild(lane);
   });
+  window.dispatchEvent(new CustomEvent('publicstudio:calendar'));
 }
 
 function getHolidayRulesForDisplay() {
@@ -1431,6 +1531,68 @@ function incomeCategoryName(value) {
   return incomeCategories.find(([category]) => category === value)?.[1] || value;
 }
 
+function appendFinanceActions(container, record, detailBookingId) {
+  const button = (label, icon, action) => {
+    const control = document.createElement('button');
+    control.type = 'button';
+    control.title = label;
+    control.setAttribute('aria-label',label);
+    control.innerHTML = `<i data-lucide="${icon}"></i>`;
+    control.addEventListener('click',action);
+    container.appendChild(control);
+    return control;
+  };
+  if (record.kind === 'refund') {
+    const original = state.incomes.find(item=>item.id===record.refund_of);
+    const link = button('查看原收款','external-link',()=> {
+      $('orderDetailDialog').close();
+      $('incomeAnchorDate').value = original.date;
+      incomePeriod = 'day';
+      switchTab('income');
+      renderIncome();
+      const target = $(`income-${original.id}`);
+      target?.scrollIntoView({block:'center'});
+      if (target) {target.tabIndex = -1;target.focus();}
+    });
+    link.disabled = !original;
+    const reference = document.createElement('small');
+    reference.textContent = `原收款：${record.refund_of}`;
+    reference.style.overflowWrap = 'anywhere';
+    container.appendChild(reference);
+  }
+  if (record.voided_at) return;
+  const finish = (result) => {
+    if (!result.ok) {
+      alert(result.reason === 'active_refunds' ? '请先作废该收款的所有有效退款，再作废收款。' : result.reason === 'storage' ? '本机保存失败，请检查存储后重试。' : '操作未保存：记录可能已变化，请检查金额、日期和原因后重试。');
+      return;
+    }
+    renderAll();
+    if (detailBookingId) {
+      const booking = state.bookings.find(item=>item.id===detailBookingId);
+      if (booking) openOrderDetail(booking);
+    }
+    showToast('财务记录已保存');
+  };
+  if (record.kind === 'receipt' && refundableCents(record) > 0) {
+    button('退款','undo-2',async()=> {
+      const amount = prompt(`退款金额（最多 ${money(refundableCents(record) / 100)}）`,String(refundableCents(record) / 100));
+      if (amount === null) return;
+      const date = prompt('退款日期（YYYY-MM-DD）',today());
+      if (date === null) return;
+      const reason = prompt('退款原因（必填）','');
+      if (reason === null) return;
+      if (!confirm(`确认登记退款 ${amount} 元？\n日期：${date}\n原因：${reason}\n原收款：${record.id}\n此操作仅记账，不会自动转账。`)) return;
+      finish(await createRefund(record.id,{amount,date,reason}));
+    });
+  }
+  button('作废','circle-slash',async()=> {
+    const reason = prompt('作废原因（必填，记录将保留）','');
+    if (reason === null) return;
+    if (!confirm(`确认作废这笔${record.kind === 'refund' ? '退款' : '收款'} ${money(record.amount)}？\n原因：${reason}\n作废仅纠正账目，不会自动收款或退款。`)) return;
+    finish(await voidIncome(record.id,reason));
+  });
+}
+
 function shiftIncomeAnchor(direction) {
   const anchor = $('incomeAnchorDate').value;
   if (!isDate(anchor)) return;
@@ -1456,28 +1618,29 @@ function renderIncomeChart(records, bounds, period) {
   const buckets = [];
   if (period === 'day') {
     incomeCategories.forEach(([value, label]) => {
-      buckets.push({ label, total: records.filter((record) => record.category === value).reduce((sum, record) => sum + record.amount, 0) });
+      buckets.push({ label, total: financeTotals(records.filter((record) => record.category === value)).net });
     });
   } else {
     let date = bounds.start;
     while (date && date <= bounds.end) {
       buckets.push({
         label: period === 'week' ? `${Number(date.slice(8))}日` : String(Number(date.slice(8))),
-        total: records.filter((record) => record.date === date).reduce((sum, record) => sum + record.amount, 0)
+        total: financeTotals(records.filter((record) => record.date === date)).net
       });
       date = shiftDate(date, 1);
     }
   }
   chart.style.setProperty('--bar-count', String(buckets.length));
-  const max = Math.max(0, ...buckets.map((bucket) => bucket.total));
+  const max = Math.max(0, ...buckets.map((bucket) => Math.abs(bucket.total)));
   buckets.forEach((bucket) => {
     const bar = document.createElement('div');
     bar.className = 'income-bar';
     bar.title = `${bucket.label} ${money(bucket.total)}`;
     const column = document.createElement('i');
-    column.style.setProperty('--bar-height', max ? `${Math.max(3, bucket.total / max * 100)}%` : '3px');
+    column.style.setProperty('--bar-height', max ? `${Math.max(3, Math.abs(bucket.total) / max * 100)}%` : '3px');
+    if (bucket.total < 0) column.style.background = '#b42318';
     const label = document.createElement('span');
-    label.textContent = bucket.label;
+    label.textContent = `${bucket.label}${bucket.total < 0 ? ' (-)' : ''}`;
     bar.append(column, label);
     chart.appendChild(bar);
   });
@@ -1493,7 +1656,7 @@ function renderIncome() {
   const bounds = getIncomePeriodBounds(anchor, incomePeriod);
   const records = getIncomeRecordsInPeriod(state.incomes, anchor, incomePeriod)
     .sort((a, b) => `${b.date} ${b.created_at}`.localeCompare(`${a.date} ${a.created_at}`));
-  const total = Math.round(records.reduce((sum, record) => sum + record.amount, 0) * 100) / 100;
+  const total = financeTotals(records).net;
   $('incomePeriodLabel').textContent = incomePeriodLabel(bounds, incomePeriod);
   $('incomePeriodTotal').textContent = money(total);
   $('incomeRecordCount').textContent = `${records.length} 笔`;
@@ -1513,6 +1676,7 @@ function renderIncome() {
   records.forEach((record) => {
     const row = document.createElement('article');
     row.className = 'income-record';
+    row.id = `income-${record.id}`;
     const icon = document.createElement('span');
     icon.className = 'income-record-icon';
     const iconElement = document.createElement('i');
@@ -1522,31 +1686,18 @@ function renderIncome() {
     copy.className = 'income-record-copy';
     const title = document.createElement('strong');
     title.textContent = `${incomeCategoryName(record.category)}${record.customer_name ? ` · ${record.customer_name}` : ''}`;
+    const badge = document.createElement('span');
+    badge.className = `finance-badge finance-${record.voided_at ? 'void' : record.kind}`;
+    badge.textContent = `${record.kind === 'refund' ? '退款' : '收款'}${record.voided_at ? ' · 已作废' : ''}`;
     const detail = document.createElement('small');
-    detail.textContent = `${record.date}${record.payment_method ? ` · ${record.payment_method}` : ''}${record.note ? ` · ${record.note}` : ''}`;
-    copy.append(title, detail);
+    detail.textContent = `${record.date}${record.payment_method ? ` · ${record.payment_method}` : ''}${record.note ? ` · ${record.note}` : ''}${record.reason ? ` · 退款原因：${record.reason}` : ''}${record.void_reason ? ` · 作废原因：${record.void_reason} · ${record.voided_at}` : ''}`;
+    copy.append(badge, title, detail);
     const amount = document.createElement('strong');
     amount.className = 'income-record-amount';
-    amount.textContent = money(record.amount);
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.className = 'plain-icon';
-    remove.setAttribute('aria-label', `删除 ${record.date} ${money(record.amount)} 收入`);
-    const trash = document.createElement('i');
-    trash.setAttribute('data-lucide', 'trash-2');
-    remove.appendChild(trash);
-    remove.addEventListener('click', async () => {
-      if (!confirm(`确定删除 ${record.date} 的 ${money(record.amount)} 收款记录吗？`)) return;
-      remove.disabled = true;
-      const result = await deleteIncomeAtomically(record.id);
-      if (result.ok) {
-        showToast('收款记录已删除');
-        renderAll();
-      } else {
-        remove.disabled = false;
-      }
-    });
-    row.append(icon, copy, amount, remove);
+    amount.textContent = `${record.kind === 'refund' ? '-' : ''}${money(record.amount)}`;
+    if (record.voided_at) amount.style.textDecoration = 'line-through';
+    appendFinanceActions(copy,record);
+    row.append(icon, copy, amount);
     list.appendChild(row);
   });
   refreshIcons();
@@ -1566,12 +1717,12 @@ function fillIncomeBookingOptions(selectedId = '') {
 function applyBookingToIncomeForm(bookingId) {
   const booking = state.bookings.find((item) => item.id === bookingId);
   if (!booking) return;
-  const collected = state.incomes.filter((record) => record.booking_id === booking.id).reduce((sum, record) => sum + record.amount, 0);
-  const remaining = Math.max(0, Number(booking.total_fee || 0) - collected);
+  const collected = financeSummary(booking.id).net;
+  const remaining = booking.status === 'cancelled' ? 0 : Math.max(0, Math.round(Number(booking.total_fee || 0) * 100) - Math.round(collected * 100)) / 100;
   $('incomeCustomer').value = booking.customer_name;
   $('incomeCategory').value = collected > 0 ? (remaining > 0 ? 'balance' : 'extra') : 'deposit';
   $('incomeAmount').value = remaining > 0 ? String(collected > 0 ? remaining : booking.deposit_amount) : '';
-  $('incomeNote').value = `${booking.scene_name} ${booking.date} ${booking.start_time}-${booking.end_time}${remaining > 0 ? '' : ' · 订单已收足，请填写额外实收'}`;
+  $('incomeNote').value = `${booking.scene_name} ${booking.date} ${booking.start_time}-${booking.end_time}${booking.status === 'cancelled' ? ' · 已取消' : remaining > 0 ? '' : ' · 订单已收足，请填写额外实收'}`;
 }
 
 function isIncomeDirty() {
@@ -1601,7 +1752,7 @@ async function saveIncome(event) {
   event.preventDefault();
   const input = {
     date: $('incomeDate').value,
-    amount: Number($('incomeAmount').value),
+    amount: $('incomeAmount').value,
     category: $('incomeCategory').value,
     booking_id: $('incomeBooking').value,
     customer_name: $('incomeCustomer').value,
@@ -1668,6 +1819,7 @@ function renderAll() {
   renderBackupMeta();
   updateFeePreview();
   refreshIcons();
+  window.dispatchEvent(new CustomEvent('publicstudio:render'));
 }
 
 function openEdit(booking) {
@@ -1752,6 +1904,7 @@ function showSaveSuccess(booking, warnings = []) {
   }
   $('saveSuccessDialog').dataset.bookingId = booking.id;
   $('saveSuccessDialog').showModal();
+  window.dispatchEvent(new CustomEvent('publicstudio:saved',{detail:{bookingId:booking.id}}));
 }
 
 function hasScheduleChanged(current, next) {
@@ -1910,6 +2063,7 @@ function handleNativeBack() {
     requestCloseDialog(openDialog);
     return;
   }
+  if (window.PublicOperations?.handleBack?.()) return;
   if (activeTab !== 'book') {
     switchTab('book', { top: true });
     return;

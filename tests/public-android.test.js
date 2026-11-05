@@ -14,8 +14,8 @@ test('public application has independent identity, baseline version and no INTER
   assert.equal(config.appName, '摄影棚预约管理');
   const gradle = await read('android/app/build.gradle');
   assert.match(gradle, /applicationId 'com\.studiobooking\.publicapp'/);
-  assert.match(gradle, /versionCode 3\b/);
-  assert.match(gradle, /versionName '1\.0\.2'/);
+  assert.match(gradle, /versionCode 4\b/);
+  assert.match(gradle, /versionName '1\.1\.0'/);
   assert.doesNotMatch(gradle, /signingConfigs\.debug|com\.xiamustudio/);
   const manifest = await read('android/app/src/main/AndroidManifest.xml');
   assert.doesNotMatch(manifest, /android\.permission\.INTERNET/);
@@ -25,13 +25,14 @@ test('public application has independent identity, baseline version and no INTER
   const paths = await read('android/app/src/main/res/xml/file_paths.xml');
   assert.doesNotMatch(paths, /external-path/);
   assert.match(paths, /path="backups\/"/);
+  assert.match(paths, /path="confirmation\/"/);
 });
 
 test('npm lockfile agrees with exact pinned dependencies', async () => {
   const pkg = JSON.parse(await read('package.json'));
   const lock = JSON.parse(await read('package-lock.json'));
   assert.equal(lock.lockfileVersion, 3);
-  assert.equal(pkg.version, '1.0.2');
+  assert.equal(pkg.version, '1.1.0');
   assert.equal(lock.version, pkg.version);
   assert.equal(lock.packages[''].version, pkg.version);
   assert.deepEqual(lock.packages[''].dependencies, pkg.dependencies);
@@ -59,13 +60,15 @@ test('native bridge preserves web API and uses generic backup branding', async (
   assert.match(bridge, /window.XiamuNative/);
   assert.match(bridge, /xiamu:native-back/);
   assert.match(bridge, /Directory.Cache/);
+  assert.match(bridge, /shareImage/);
+  assert.match(bridge, /confirmation\/booking\.png/);
   assert.doesNotMatch(bridge, /夏暮|xiamustudio/);
 });
 
 test('sync allowlist excludes private files, injects bridge, and fails closed', async t => {
   const { syncWeb, runtimeFiles } = await import(pathToFileURL(path.join(project, 'scripts/sync-web.mjs')));
   assert.deepEqual([...runtimeFiles].sort(), [
-    'index.html', 'app.js', 'config.js', 'config-ui.js', 'styles.css', 'lucide.min.js', 'contact.js', 'author-contact.png',
+    'index.html', 'app.js', 'config.js', 'config-ui.js', 'styles.css', 'lucide.min.js', 'contact.js', 'author-contact.png', 'operations.js', 'operations.css', 'confirmation.js',
     'icon.png', 'one-page-guide.svg', '使用说明.html', '一图流.html', 'manifest.webmanifest', 'sw.js'
   ].sort());
   const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'public-android-test-'));

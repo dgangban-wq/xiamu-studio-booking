@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $project = Join-Path $root 'public-android'
 if (!$ApkPath) { $ApkPath = Join-Path $project 'android/app/build/outputs/apk/release/app-release.apk' }
-$files = @('index.html','app.js','config.js','config-ui.js','styles.css','lucide.min.js','icon.png','one-page-guide.svg','使用说明.html','一图流.html','manifest.webmanifest','sw.js','contact.js','author-contact.png')
+$files = @('index.html','app.js','config.js','config-ui.js','styles.css','lucide.min.js','icon.png','one-page-guide.svg','使用说明.html','一图流.html','manifest.webmanifest','sw.js','contact.js','author-contact.png','operations.js','operations.css','confirmation.js')
 $allowed = @($files) + @('native-bridge.js','cordova.js','cordova_plugins.js')
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip = [IO.Compression.ZipFile]::OpenRead($ApkPath)

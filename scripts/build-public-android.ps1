@@ -44,12 +44,12 @@ try {
     $permissions = & (Join-Path $buildTools 'aapt.exe') dump permissions $apkRelative
     if ($LASTEXITCODE -ne 0 -or ($permissions -match 'android.permission.INTERNET')) { throw 'APK permission audit failed.' }
     $badging = & (Join-Path $buildTools 'aapt.exe') dump badging $apkRelative
-    if ($LASTEXITCODE -ne 0 -or !($badging -match "package: name='com.studiobooking.publicapp' versionCode='3' versionName='1\.0\.2'")) { throw 'APK package identity audit failed.' }
+    if ($LASTEXITCODE -ne 0 -or !($badging -match "package: name='com.studiobooking.publicapp' versionCode='4' versionName='1\.1\.0'")) { throw 'APK package identity audit failed.' }
     if ($badging -match 'application-debuggable') { throw 'Release APK must not be debuggable.' }
     & (Join-Path $PSScriptRoot 'build-public-verify.ps1') -ApkPath $apk
     $distribution = Join-Path $root 'public-distribution'
     New-Item -ItemType Directory -Force $distribution | Out-Null
-    $installer = Join-Path $distribution '摄影棚预约管理-v1.0.2.apk'
+    $installer = Join-Path $distribution '摄影棚预约管理-v1.1.0.apk'
     Copy-Item -LiteralPath $apk -Destination $installer
     Copy-Item -LiteralPath (Join-Path $project '安装说明.txt') -Destination (Join-Path $distribution '安卓安装说明.txt')
     $hash = (Get-FileHash $installer -Algorithm SHA256).Hash

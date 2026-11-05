@@ -6,11 +6,11 @@ import { createHash } from 'node:crypto';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = resolve(root, 'public-app');
 const distribution = resolve(root, 'public-distribution');
-const bundle = resolve(distribution, '摄影棚预约管理-公开版1.0.2');
+const bundle = resolve(distribution, '摄影棚预约管理-公开版1.1.0');
 const web = resolve(bundle, '电脑版文件');
-const files = ['index.html','app.js','config.js','config-ui.js','styles.css','lucide.min.js','contact.js','author-contact.png',
+const files = ['index.html','app.js','config.js','config-ui.js','styles.css','lucide.min.js','contact.js','author-contact.png','operations.js','operations.css','confirmation.js',
   'icon.png','manifest.webmanifest','sw.js','one-page-guide.svg','使用说明.html','一图流.html'];
-const apkName = '摄影棚预约管理-v1.0.2.apk';
+const apkName = '摄影棚预约管理-v1.1.0.apk';
 // Resolve all required inputs before creating the distributable bundle.
 const apk = await readFile(resolve(distribution, apkName));
 const assets = await Promise.all(files.map(async name => ({ name, content:await readFile(resolve(source,name)) })));
@@ -23,7 +23,7 @@ for (const name of ['使用说明.html','一图流.html','one-page-guide.svg']) 
   await writeFile(resolve(bundle,name),content);
 }
 await writeFile(resolve(bundle,'电脑双击打开.html'),`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=./电脑版文件/index.html"><title>摄影棚预约管理</title></head><body><a href="./电脑版文件/index.html">打开摄影棚预约管理</a></body></html>`);
-await writeFile(resolve(bundle,'先读我-安装与数据说明.txt'),`摄影棚预约管理 · 公开版 1.0.2
+await writeFile(resolve(bundle,'先读我-安装与数据说明.txt'),`摄影棚预约管理 · 公开版 1.1.0
 
 安卓手机：打开“安卓手机安装-摄影棚预约管理.apk”。
 电脑：完整解压后双击“电脑双击打开.html”。不要单独移动电脑版文件夹内的文件。

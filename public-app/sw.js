@@ -1,7 +1,7 @@
-const cacheName = 'studio-public-v1.0.2';
+const cacheName = 'studio-public-v1.1.0';
 const assets = ['./', './index.html', './styles.css', './app.js', './config.js',
   './config-ui.js', './lucide.min.js', './manifest.webmanifest', './icon.png',
-  './one-page-guide.svg', './一图流.html', './使用说明.html', './contact.js', './author-contact.png'];
+  './one-page-guide.svg', './一图流.html', './使用说明.html', './contact.js', './author-contact.png', './operations.js', './operations.css', './confirmation.js'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(assets)));

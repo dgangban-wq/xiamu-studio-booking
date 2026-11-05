@@ -1,0 +1,89 @@
+[hidden] { display: none !important; }
+body:not([data-booking-open="true"]) #bookingSubmitBar { display: none; }
+body:not([data-active-tab="book"]) .quick-summary,
+body[data-booking-open="true"] .quick-summary { display: none; }
+body:not([data-booking-open="true"]) { padding-bottom: 88px; }
+.workbench { padding: 20px 0; }
+.quick-summary article.wide { display: none; }
+#newBooking { width: auto; flex-shrink: 0; }
+.workbench > .section-head > div { min-width: 0; }
+.workbench > .section-head h2 { font-size: 22px; }
+.workbench button:not(.primary), .calendar-scene button, .wizard-actions button:not(.primary) { border: 1px solid var(--line-strong); background: var(--panel-strong); border-radius: 6px; color: var(--text); }
+.workbench .period-tabs button.active { background: var(--teal); color: #fff; }
+.workbench h2, .calendar-day h3 { margin: 0; }
+.workbench .section-head button { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.workbench-next { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 0; margin-bottom: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.workbench-next h3 { margin: 8px 0; font-size: 19px; overflow-wrap: anywhere; }
+.workbench-next p { margin: 0; color: var(--muted); overflow-wrap: anywhere; }
+.workbench-next > div { min-width: 0; }
+.workbench-next button { flex: 0 0 auto; }
+.workbench button svg, .calendar-scene button svg, .wizard-actions svg { width: 18px; height: 18px; flex-shrink: 0; }
+.workbench-list { margin-top: 16px; }
+.work-row { display: flex; justify-content: space-between; gap: 12px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.work-row-body { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; overflow-wrap: anywhere; }
+.work-row-body > span:not(.status-badge) { font-size: 13px; color: var(--muted); }
+.work-row-actions { display: flex; align-items: flex-start; gap: 6px; flex-shrink: 0; }
+.work-row-actions button, .workbench-next button { display: inline-flex; align-items: center; gap: 5px; min-height: 40px; padding: 8px 10px; font-size: 13px; }
+.amount-due { color: var(--orange); }
+.status-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border: 1px solid var(--line-strong); border-radius: 4px; font-size: 12px; }
+.ops-turnaround { color: var(--danger); border-left: 3px solid var(--orange); padding: 6px 10px; margin: 6px 0; font-size: 12px; line-height: 1.7; white-space: pre-line; overflow-wrap: anywhere; }
+.booking-mode-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin: 12px 0; }
+.booking-steps { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; margin: 20px 0; }
+.booking-steps button { padding: 9px 4px; border: 0; border-bottom: 3px solid var(--line); border-radius: 0; background: transparent; font-size: 13px; }
+.booking-steps button[aria-current="step"] { color: var(--teal); border-bottom-color: var(--teal); font-weight: 700; }
+.period-tabs button[aria-pressed="true"] { background: var(--teal); color: #fff; }
+.booking-step { min-width: 0; }
+.booking-step .two { margin-bottom: 12px; }
+.wizard-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+.wizard-actions button { display: flex; align-items: center; gap: 8px; }
+.booking-review { display: grid; grid-template-columns: 70px minmax(0,1fr); gap: 10px 12px; margin: 16px 0; font-size: 14px; }
+.booking-review dt { color: var(--muted); }
+.booking-review dd { margin: 0; overflow-wrap: anywhere; }
+body[data-booking-mode="quick"] .booking-review { display: none; }
+.calendar-controls { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.calendar-controls .field { margin: 0; flex: 1; min-width: 120px; }
+.calendar-controls .toggle-line { margin: 0; }
+.calendar-controls .period-tabs { flex-shrink: 0; }
+.ops-calendar { display: block; }
+.calendar-day { margin-bottom: 24px; }
+.calendar-day > h3 { font-size: 16px; padding: 12px 0; border-bottom: 2px solid var(--line-strong); }
+.calendar-scene { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.calendar-scene h4 { margin: 0 0 10px; font-size: 15px; overflow-wrap: anywhere; }
+.calendar-booked { display: grid; gap: 6px; }
+.calendar-booking { text-align: left; display: flex; align-items: center; gap: 8px; border-left: 4px solid var(--blue); width: 100%; padding: 10px; min-height: 44px; }
+.calendar-booking span { overflow-wrap: anywhere; min-width: 0; }
+.calendar-booking[data-status="deposit_paid"] { border-left-color: var(--teal); }
+.calendar-booking[data-status="completed"] { border-left-color: var(--muted); }
+.calendar-free { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 10px; }
+.free-slot { display: flex; align-items: center; gap: 5px; font-size: 13px; padding: 8px 10px; min-height: 40px; border: 1px dashed var(--teal); color: var(--teal); }
+.more-slots { flex-basis: 100%; }
+.more-slots summary { padding: 8px 0; cursor: pointer; font-size: 13px; color: var(--muted); }
+.settings-shortcuts { display: grid; }
+.settings-shortcuts button { display: flex; align-items: center; gap: 12px; padding: 16px 0; background: transparent; border: 0; border-top: 1px solid var(--line); border-radius: 0; text-align: left; }
+.settings-shortcuts button span { flex: 1; }
+.settings-shortcuts svg { width: 20px; height: 20px; }
+#settings > section { border-radius: 0; box-shadow: none; border-width: 0 0 1px; background: transparent; }
+.finance-status { font-size: 12px; border: 1px solid var(--line); padding: 3px 6px; border-radius: 4px; }
+.finance-badge { display: inline-block; width: fit-content; font-size: 12px; padding: 3px 6px; margin-bottom: 4px; border: 1px solid var(--line-strong); border-radius: 4px; }
+.finance-refund { color: var(--danger); }
+.finance-void { color: var(--muted); }
+.income-record-copy > button { width: 40px; height: 40px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; margin: 6px 6px 0 0; background: var(--panel-strong); color: var(--text); }
+.income-record-copy > button svg { width: 20px; height: 20px; }
+.income-record-copy > small { overflow-wrap: anywhere; }
+.confirmation-dialog { width: min(620px,calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-strong); color: var(--text); overflow: auto; }
+.confirmation-dialog header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.confirmation-dialog h2 { font-size: 18px; margin: 0; }
+.confirmation-dialog img { display: block; width: 100%; height: auto; margin: 12px 0; border: 1px solid var(--line); }
+.confirmation-dialog .button-row { flex-wrap: wrap; }
+.confirmation-dialog .toggle-line { font-size: 13px; }
+.confirmation-dialog footer { position: sticky; bottom: -16px; background: var(--panel-strong); padding: 12px 0; }
+@media(max-width:540px) {
+  .work-row-actions { flex-direction: column; }
+  .workbench-next { align-items: flex-start; }
+  .workbench-next button span { max-width: 4em; }
+  .workbench-next h3 { font-size: 17px; }
+  .calendar-controls { gap: 10px; }
+  .calendar-controls .toggle-line { font-size: 13px; }
+  .booking-steps { gap: 3px; }
+  .booking-panel { padding: 16px; }
+}

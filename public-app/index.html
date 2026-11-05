@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f7fbef" />
-    <title>摄影棚预约管理 · 公开版 1.0.2</title>
+    <title>摄影棚预约管理 · 公开版 1.1.0</title>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="stylesheet" href="./styles.css?v=19" />
+    <link rel="stylesheet" href="./operations.css" />
   </head>
   <body data-active-tab="book">
     <div id="pullStatus" class="pull-status" role="status" aria-live="polite">
@@ -21,7 +22,7 @@
           <div class="brand-copy">
             <p class="eyebrow">STUDIO BOOKING</p>
             <h1 id="studioName">摄影棚预约管理</h1>
-            <p id="studioContact">公开版 1.0.2</p>
+            <p id="studioContact">公开版 1.1.0</p>
           </div>
         </div>
         <button id="installBtn" class="icon-btn" hidden>安装</button>
@@ -29,7 +30,7 @@
 
       <nav class="tabs bottom-nav" aria-label="主要功能">
         <button class="tab active" data-tab="book" aria-current="page">
-          <i data-lucide="calendar-plus"></i><span>预约</span>
+          <i data-lucide="layout-dashboard"></i><span>今日</span>
         </button>
         <button class="tab" data-tab="orders">
           <i data-lucide="clipboard-list"></i><span>订单</span>
@@ -77,6 +78,12 @@
       </section>
 
       <section id="book" class="screen active">
+        <section id="workbench" class="workbench">
+          <div class="section-head"><div><span id="workbenchDate" class="section-kicker"></span><h2>今日工作台</h2></div><button id="newBooking" class="primary" type="button"><i data-lucide="plus"></i>新预约</button></div>
+          <div id="workbenchNext" class="workbench-next"></div>
+          <div class="period-tabs" aria-label="工作台筛选"><button type="button" data-workbench="today" class="active">今日流程</button><button type="button" data-workbench="pending">待确认</button><button type="button" data-workbench="due">待收款</button></div>
+          <div id="workbenchList" class="workbench-list" aria-live="polite"></div>
+        </section>
         <form id="bookingForm" class="panel booking-panel" novalidate>
           <div class="section-head">
             <div>
@@ -85,7 +92,10 @@
             </div>
             <span id="datePriceType" class="price-type">工作日价</span>
           </div>
-
+          <div class="booking-mode-row"><div class="period-tabs" aria-label="录入方式"><button id="guidedBooking" type="button">分步填写</button><button id="quickBooking" type="button">快捷录入</button></div><button id="closeBooking" class="plain-icon" type="button" title="返回工作台" aria-label="返回工作台"><i data-lucide="x"></i></button></div>
+          <nav id="bookingSteps" class="booking-steps" aria-label="预约步骤"><button type="button" data-booking-step="0">1 选档期</button><button type="button" data-booking-step="1">2 填客户</button><button type="button" data-booking-step="2">3 确认金额</button></nav>
+          <div id="bookingStepError" class="form-error" role="alert" tabindex="-1"></div>
+          <div id="scheduleStep" class="booking-step">
           <div class="field">
             <label for="scene">场景</label>
             <select id="scene" name="scene_id"></select>
@@ -132,7 +142,8 @@
             <strong>紧邻档期提醒</strong>
             <span class="turnaround-text"></span>
           </div>
-
+          </div>
+          <div id="customerStep" class="booking-step">
           <div class="two">
             <div class="field">
               <label for="customer">客户姓名</label>
@@ -153,6 +164,9 @@
           </div>
 
           <div class="field"><label for="bookingNote">预约备注</label><textarea id="bookingNote" name="note" maxlength="1000" rows="2"></textarea></div>
+          </div>
+          <div id="quoteStep" class="booking-step">
+          <dl id="bookingReview" class="booking-review"></dl>
           <section class="fee-card">
             <div class="fee-main">
               <span>预计总金额</span>
@@ -166,7 +180,8 @@
             </div>
             <div id="warnings" class="warnings"></div>
           </section>
-
+          </div>
+          <div class="wizard-actions"><button id="bookingPrevious" type="button"><i data-lucide="arrow-left"></i>上一步</button><button id="bookingNext" class="primary" type="button">下一步<i data-lucide="arrow-right"></i></button></div>
           <button class="primary desktop-submit" type="submit">保存预约</button>
         </form>
 
@@ -191,7 +206,7 @@
           <div id="statusChips" class="status-chips" aria-label="订单状态筛选">
             <button type="button" class="active" data-status="">全部</button>
             <button type="button" data-status="pending">待确认</button>
-            <button type="button" data-status="deposit_paid">已付</button>
+            <button type="button" data-status="deposit_paid">已付订金</button>
             <button type="button" data-status="completed">已完成</button>
             <button type="button" data-status="cancelled">已取消</button>
           </div>
@@ -216,7 +231,9 @@
             <div class="field"><label for="calendarDate">查看日期</label><input id="calendarDate" type="date" /></div>
             <button id="calendarNext" class="icon-button" type="button" aria-label="后一天"><i data-lucide="chevron-right"></i></button>
           </div>
-          <p class="gesture-hint"><i data-lucide="move-horizontal"></i> 在下方档期区域左右滑动切换日期</p>
+          <div class="calendar-controls"><div class="period-tabs" aria-label="档期视图"><button id="calendarDayView" type="button" aria-pressed="true">日</button><button id="calendarWeekView" type="button" aria-pressed="false">周</button></div><div class="field"><label for="calendarScene">置景</label><select id="calendarScene"><option value="">全部置景</option></select></div><label class="toggle-line"><input id="calendarOnlyFree" type="checkbox" />仅看可约</label></div>
+          <div class="calendar-controls"><div class="field"><label for="calendarDuration">预约时长</label><select id="calendarDuration"></select></div><label class="toggle-line"><input id="calendarOvertime" type="checkbox" />含营业外时段</label></div>
+          <p id="calendarRangeLabel" class="form-note"></p>
         </div>
         <div id="calendarList" class="lanes schedule-board" aria-live="polite"></div>
       </section>
@@ -259,9 +276,9 @@
       </section>
 
       <section id="settings" class="screen">
-        <section class="panel studio-settings"><div class="section-head"><div><span class="section-kicker">工作室配置</span><h2 id="settingsStudioName">摄影工作室管理</h2></div><button id="openStudioConfig" class="icon-button" type="button" title="编辑工作室配置" aria-label="编辑工作室配置"><i data-lucide="sliders-horizontal"></i></button></div><p id="configSummary"></p></section>
+        <section class="panel studio-settings"><div class="section-head"><div><span class="section-kicker">工作室配置</span><h2 id="settingsStudioName">摄影工作室管理</h2></div><button id="openStudioConfig" class="icon-button" type="button" title="编辑工作室配置" aria-label="编辑工作室配置"><i data-lucide="sliders-horizontal"></i></button></div><p id="configSummary"></p><div class="settings-shortcuts"><button type="button" data-open-config="0"><i data-lucide="store"></i><span>工作室资料</span><i data-lucide="chevron-right"></i></button><button type="button" data-open-config="1"><i data-lucide="images"></i><span>置景与价格</span><i data-lucide="chevron-right"></i></button><button type="button" data-open-config="2"><i data-lucide="sliders-horizontal"></i><span>预约规则</span><i data-lucide="chevron-right"></i></button></div></section>
         <section class="panel data-panel">
-          <div class="section-head"><div><span class="section-kicker">数据安全</span><h2>本地数据</h2></div></div>
+          <div class="section-head"><div><span class="section-kicker">数据安全</span><h2>数据与备份</h2></div></div>
           <div id="backupStatusPanel" class="backup-status-panel">
             <i data-lucide="shield-check"></i>
             <div><strong id="settingsBackupTitle">本机数据正常</strong><span>上次备份：<b id="lastBackup">暂无记录</b></span></div>
@@ -311,13 +328,13 @@
             <div>
               <span class="section-kicker">关于应用</span>
               <h2>摄影棚预约管理</h2>
-              <small>当前版本 <strong id="appVersion">公开版 1.0.2</strong></small>
+              <small>当前版本 <strong id="appVersion">公开版 1.1.0</strong></small>
             </div>
             <img src="./icon.png" alt="" />
           </div>
           <button id="openChangelog" class="version-link" type="button">
             <i data-lucide="history"></i>
-            <span><strong>查看版本内容</strong><small>公开版 1.0.2</small></span>
+            <span><strong>查看版本内容</strong><small>公开版 1.1.0</small></span>
             <i data-lucide="chevron-right"></i>
           </button>
           <div class="author-contact">
@@ -427,7 +444,7 @@
     <dialog id="guideViewerDialog" class="guide-viewer">
       <div class="guide-viewer-card">
         <header>
-          <div><small>公开版 1.0.2</small><h2>一图流使用介绍</h2></div>
+          <div><small>公开版 1.1.0</small><h2>一图流使用介绍</h2></div>
           <div class="guide-viewer-actions">
             <button id="zoomGuide" class="icon-button" type="button" aria-label="放大一图流"><i data-lucide="zoom-in"></i></button>
             <button id="resetGuideZoom" class="icon-button" type="button" aria-label="恢复一图流大小"><i data-lucide="scan"></i></button>
@@ -446,7 +463,11 @@
         <div class="sheet-head"><h2>版本更新内容</h2><button id="closeChangelog" class="plain-icon" type="button" aria-label="关闭更新内容"><i data-lucide="x"></i></button></div>
         <div class="release-list">
           <article class="release-item current">
-            <header><strong>公开版 1.0.2</strong><span>当前版本</span></header>
+            <header><strong>公开版 1.1.0</strong><span>当前版本</span></header>
+            <ul><li>今日工作台、日周档期与空闲时段快速预约。</li><li>分步预约与快捷录入，设置分组直达。</li><li>部分退款、流水作废留痕与净收款统计。</li><li>本地生成预约确认单，隐私可选，支持保存和分享。</li><li>收尾间隔仍仅提醒，不强制占档。</li></ul>
+          </article>
+          <article class="release-item">
+            <header><strong>公开版 1.0.2</strong><span>历史版本</span></header>
             <ul><li>更新作者二维码展示图片，保留适应屏幕、放大及账号复制功能。</li></ul>
           </article>
           <article class="release-item">
@@ -482,5 +503,7 @@
     <script src="./app.js?v=19"></script>
     <script src="./config-ui.js"></script>
     <script src="./contact.js"></script>
+    <script src="./operations.js"></script>
+    <script src="./confirmation.js"></script>
   </body>
 </html>

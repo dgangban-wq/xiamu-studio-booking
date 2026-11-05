@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 
 export const runtimeFiles = Object.freeze([
-  'index.html', 'app.js', 'config.js', 'config-ui.js', 'styles.css', 'contact.js', 'author-contact.png',
+  'index.html', 'app.js', 'config.js', 'config-ui.js', 'styles.css', 'contact.js', 'author-contact.png', 'operations.js', 'operations.css', 'confirmation.js',
   'lucide.min.js', 'icon.png', 'one-page-guide.svg', '使用说明.html', '一图流.html',
   'manifest.webmanifest', 'sw.js'
 ]);
