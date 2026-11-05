@@ -1,4 +1,4 @@
-const cacheName = 'studio-public-v1.0.1';
+const cacheName = 'studio-public-v1.0.2';
 const assets = ['./', './index.html', './styles.css', './app.js', './config.js',
   './config-ui.js', './lucide.min.js', './manifest.webmanifest', './icon.png',
   './one-page-guide.svg', './一图流.html', './使用说明.html', './contact.js', './author-contact.png'];

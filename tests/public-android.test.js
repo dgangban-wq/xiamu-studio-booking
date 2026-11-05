@@ -14,8 +14,8 @@ test('public application has independent identity, baseline version and no INTER
   assert.equal(config.appName, '摄影棚预约管理');
   const gradle = await read('android/app/build.gradle');
   assert.match(gradle, /applicationId 'com\.studiobooking\.publicapp'/);
-  assert.match(gradle, /versionCode 2\b/);
-  assert.match(gradle, /versionName '1\.0\.1'/);
+  assert.match(gradle, /versionCode 3\b/);
+  assert.match(gradle, /versionName '1\.0\.2'/);
   assert.doesNotMatch(gradle, /signingConfigs\.debug|com\.xiamustudio/);
   const manifest = await read('android/app/src/main/AndroidManifest.xml');
   assert.doesNotMatch(manifest, /android\.permission\.INTERNET/);
@@ -31,7 +31,7 @@ test('npm lockfile agrees with exact pinned dependencies', async () => {
   const pkg = JSON.parse(await read('package.json'));
   const lock = JSON.parse(await read('package-lock.json'));
   assert.equal(lock.lockfileVersion, 3);
-  assert.equal(pkg.version, '1.0.1');
+  assert.equal(pkg.version, '1.0.2');
   assert.equal(lock.version, pkg.version);
   assert.equal(lock.packages[''].version, pkg.version);
   assert.deepEqual(lock.packages[''].dependencies, pkg.dependencies);

@@ -127,6 +127,7 @@ async function main() {
       await page.screenshot({ path:path.join(output, `guide-${viewport.width}.png`), fullPage:true });
       await page.locator('#closeGuideViewer').click();
       await page.getByRole('button', {name:'复制抖音账号', exact:true}).click();
+      await page.waitForFunction(() => document.getElementById('authorCopyStatus').textContent.length > 0);
       assert.match(await page.locator('#authorCopyStatus').innerText(), /已复制：ump45大钢板（求推荐版）/);
       await page.locator('#openAuthorContact').click();
       await page.locator('#authorPoster').evaluate(img => img.decode());
@@ -135,6 +136,7 @@ async function main() {
       await page.screenshot({path:path.join(output,`contact-${viewport.width}.png`),fullPage:false});
       await page.locator('#zoomAuthorContact').click();
       await page.waitForFunction(() => document.getElementById('zoomAuthorContact').disabled);
+      await page.waitForFunction(() => {const p=document.getElementById('authorPosterPane');return p.scrollWidth>p.clientWidth;});
       assert.equal(await page.locator('#authorPosterPane').evaluate(p=>p.scrollWidth>p.clientWidth), true);
       await page.locator('#resetAuthorContact').click();
       await page.waitForFunction(() => {const p=document.getElementById('authorPosterPane');return p.scrollWidth<=p.clientWidth+1;});
