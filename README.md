@@ -99,5 +99,6 @@
 ## 联系作者
 
 B站 **@ump45大钢板** · 抖音 **@ump45大钢板（求推荐版** · 小红书 **@ump45大钢板**
-![Uploading Codex 图像 2026年9月22日 16_52_11.png…]()
+<img width="1254" height="1254" alt="Codex 图像 2026年9月22日 16_52_11" src="https://github.com/user-attachments/assets/0626de13-5cf3-4355-b6bd-211bb24b20ea" />
+
 
