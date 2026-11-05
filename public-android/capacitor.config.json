@@ -1,0 +1,6 @@
+{
+  "appId": "com.studiobooking.publicapp",
+  "appName": "摄影棚预约管理",
+  "webDir": "www",
+  "android": { "allowMixedContent": false }
+}

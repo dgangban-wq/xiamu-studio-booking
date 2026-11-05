@@ -1,0 +1,22 @@
+{
+  "name": "studio-booking-public-android",
+  "version": "1.0.1",
+  "private": true,
+  "scripts": {
+    "sync:web": "node scripts/sync-web.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "sync:android": "node scripts/sync-web.mjs && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.4.2",
+    "@capacitor/app": "8.0.1",
+    "@capacitor/core": "8.4.2",
+    "@capacitor/filesystem": "8.1.2",
+    "@capacitor/share": "8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.4.2",
+    "esbuild": "0.25.12",
+    "sharp": "0.34.5"
+  }
+}

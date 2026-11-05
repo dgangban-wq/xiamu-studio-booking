@@ -1,0 +1,17 @@
+{
+  "name": "摄影棚预约管理 · 公开版",
+  "short_name": "摄影棚预约",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f7fbef",
+  "theme_color": "#f7fbef",
+  "description": "可自定义工作室、置景和收费规则的离线预约与收入管理工具",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

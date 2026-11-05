@@ -28,6 +28,18 @@ android-app/android/keystore.properties
 夏暮工作室安卓App-v1.2-安装包和说明.zip
 xiamu-offline-app.zip
 
+# Independent public Android generated output; never publish signing material.
+public-android/www/
+public-android/android/.gradle/
+public-android/android/**/build/
+public-android/android/local.properties
+public-android/android/capacitor-cordova-android-plugins/
+public-android/android/app/src/main/assets/
+public-android/signing/
+public-android/**/keystore.properties
+public-distribution/
+public-distribution/validation/
+
 # Old installers and generated APK copies. Keep the current v1.2 installer.
 安卓安装包/夏暮工作室摄影棚预约-v1.0.apk
 安卓安装包/夏暮工作室摄影棚预约-v1.1.apk

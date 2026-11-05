@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">摄影棚预约管理</string>
+    <string name="title_activity_main">摄影棚预约管理</string>
+    <string name="package_name">com.studiobooking.publicapp</string>
+    <string name="custom_url_scheme">com.studiobooking.publicapp</string>
+</resources>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>摄影棚预约管理 · 公开版使用说明</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,"Microsoft YaHei",sans-serif;color:#183d43;background:#f5f8f8;line-height:1.8}*{box-sizing:border-box}body{margin:0}main{max-width:900px;margin:auto;padding:28px 20px 80px}header{border-bottom:3px solid #158477;padding:20px 0}h1{font-size:28px;line-height:1.4}h2{margin-top:40px;font-size:22px;border-bottom:1px solid #d0dedd;padding-bottom:8px}h3{font-size:17px}p,li{overflow-wrap:anywhere}a{color:#087c76}.label{color:#47646b;font-size:14px}.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}.step{background:#fff;padding:16px;border:1px solid #d0dedd;border-radius:8px}.step b{display:block;color:#087c76;font-size:22px}.step span{font-size:14px}.example{background:#fff;border-left:4px solid #e9b34c;padding:16px 20px;margin:20px 0}.screen{border:1px solid #d0dedd;border-radius:8px;background:white;max-width:420px;margin:20px auto;padding:20px}.screen h3{margin:0 0 12px}.row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #e9eeee;padding:9px 0}.screen footer{display:flex;justify-content:space-between;border-top:2px solid #168577;margin-top:20px;padding-top:10px;font-size:13px}.amount{color:#c45a28;font-weight:bold}.timeline{display:grid;grid-template-columns:1fr 1fr;gap:3px}.slot{padding:14px;background:#e0f1ee;color:#17645b;font-size:14px}.slot.warn{background:#fff0d1;color:#7d5b18}table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:10px 6px;border-bottom:1px solid #d0dedd;text-align:left}code{word-break:break-all}@media(max-width:600px){.flow{grid-template-columns:1fr 1fr}h1{font-size:24px}main{padding:16px 16px 60px}}@media print{body{background:white}main{max-width:none;padding:0}h2{break-after:avoid}.screen,.example,.flow{break-inside:avoid}a{color:inherit}}
+</style>
+</head>
+<body><main>
+<header><p class="label">摄影棚预约管理 / 公开版 1.0</p><h1>从设置工作室到保存第一笔预约</h1><p>面向棚主的离线预约与实收管理工具。无需账号，订单和配置保存在当前设备。</p><a href="./一图流.html">查看一图流</a> · <a href="./index.html">打开预约工具</a></header>
+<h2>1. 安装与首次设置</h2>
+<p>安卓手机安装公开版 APK。它与夏暮专用版是两个独立应用，可以同时保留；公开版不会自动读取专用版里的订单。电脑使用时，保持整个网页文件夹完整，打开其中的 <code>index.html</code>。</p>
+<div class="flow"><div class="step"><b>01</b><strong>工作室</strong><br><span>名称、Logo、联系方式和外观</span></div><div class="step"><b>02</b><strong>置景</strong><br><span>名称、价格、限人数和共用场地</span></div><div class="step"><b>03</b><strong>规则</strong><br><span>营业时间、起租、订金和附加费</span></div><div class="step"><b>04</b><strong>保存</strong><br><span>检查配置，开始登记预约</span></div></div>
+<p>工作室名称和 Logo 用于 App 内展示；手机桌面的名称和图标使用公开版统一标识。日后可在“设置”中继续修改。最后一步可填写一笔试算预约，核对费用后保存。切换步骤会保留草稿，关闭前若有修改会询问。</p>
+<h2>2. 建立置景与价格</h2>
+<p>每个可预约场景建立一条置景记录，填写工作日、周末和节假日的小时价格、人数上限，也可选择照片和说明。通过排序调整预约列表顺序，暂时不接单的置景可停用。</p>
+<div class="example"><strong>共用场地示例</strong><p>白墙景和窗边景实际上在同一个房间，给它们填写相同的共用场地名称，比如“A 棚”。白墙景 10:00-12:00 已被预约时，窗边景相同时段也不能再接单。两个独立房间则不要设成同组。</p></div>
+<p>已经关联订单的置景不能直接删除，停用后旧订单仍然保留。改价只影响新预约，历史订单保留原金额。</p>
+<p>图片支持 PNG、JPEG、WebP，原图最大 10 MB。系统在本机压缩后保存；所有配置合计限制约 2 MB。透明区域转换为白色，超出容量时会提示，保存失败不会覆盖原配置。</p>
+<h2>3. 保存预约</h2>
+<p>依次选择置景、日期、起止时间，填写拍摄人数、客户姓名和联系方式。检查费用明细后保存。手机号和微信号是否必填由工作室设置决定。</p>
+<div class="screen" aria-label="预约费用示意，非实际订单"><h3>预约费用示意</h3><div class="row"><span>置景</span><b>白棚</b></div><div class="row"><span>时间</span><b>10:00-12:00</b></div><div class="row"><span>小时价格</span><b>¥120</b></div><div class="row"><span>预计总金额</span><b class="amount">¥240</b></div><div class="row"><span>订金（1 小时租金示例）</span><b>¥120</b></div><footer><span>预约</span><span>订单</span><span>档期</span><span>收入</span><span>设置</span></footer></div>
+<p>加班费按营业时间之外的实际分钟折算，超员费按每单超出的人数收取。订金可配置为若干小时租金、固定金额、总金额比例或不收订金。以上示意价格仅用于说明。</p>
+<h2>4. 撞档与收尾提醒</h2>
+<p>同一置景或共用场地的实际时间重叠会被阻止。收尾提醒不占用档期，间隔小于配置值时提醒棚主协调客户。</p>
+<div class="timeline"><div class="slot">第一单<br><strong>10:00-12:00</strong></div><div class="slot warn">第二单<br><strong>12:00-14:00</strong><br>可以预约，可能触发紧邻提醒</div></div>
+<p>第二单若改为 11:30 开始，则与第一单重叠，会被阻止。已取消的订单不占用档期。档期页可以查看占用情况，左右滑动切换日期。</p>
+<h2>5. 状态、改签与收款</h2>
+<table><thead><tr><th>操作</th><th>用途</th></tr></thead><tbody><tr><td>已付订金</td><td>记录订金确认状态；实际到账还需记入收入。</td></tr><tr><td>已完工</td><td>标记本次拍摄已结束，不等同于收齐款项。</td></tr><tr><td>已取消</td><td>保留记录并释放档期，不自动删除收款记录。</td></tr><tr><td>改签</td><td>修改日期或起止时间计次，仅改人数不计次。</td></tr></tbody></table>
+<p>改签默认按原订单的收费规则重算；需要改用当前价格时明确选择最新规则。保存前核对金额和改签费。订单卡片可左右滑出操作按钮，也可直接点击普通按钮。</p>
+<h2>6. 记录实际收入</h2>
+<p>真正收到钱后，在“收入”中记一笔，选择订金、尾款、全款、加收或其他分类。可关联订单并填写备注。页面按日、周、月统计，周从周一开始。</p>
+<div class="example"><strong>预计应收不等于到账</strong><p>订单总额 ¥240，今天只收到 ¥120 订金，就只记录 ¥120。以后收到尾款再记一笔，避免重复计算。订单取消或改签不会自动退款或改写已登记收入。</p></div>
+<h2>7. 节假日与休息日</h2>
+<p>系统离线运行，不能自动下载每年的法定放假和调休安排。跨年时检查日期规则，手动维护放假、补班及工作室临时休息日。日期规则优先于普通周末判断。</p>
+<h2>8. 备份、恢复与换机</h2>
+<ol><li>在“设置”导出 JSON 备份，将文件另存到电脑或可靠的文件存储位置。</li><li>新设备安装公开版后，选择该 JSON 文件导入。</li><li>合并导入用于保留已有数据；覆盖导入会替换本机内容，请先备份。</li><li>导入后检查置景、订单数、金额和收入明细。</li></ol>
+<p>公开版备份包括工作室资料、图片、置景、规则、订单和收入。夏暮版旧备份可导入，系统会补齐原有置景配置。不同设备间导入是手动迁移，不是实时同步。</p>
+<p>合并导入遇到相同编号时优先保留本机记录，不用旧备份覆盖本机新订单。需要完全恢复某份备份时，先导出本机数据，再选择覆盖导入。无效或撞档的备份会被拒绝，并保留本机原数据。</p>
+<div class="example"><strong>什么时候数据可能丢失？</strong><p>正常退出或重启一般不会丢失保存的数据。卸载、清除应用数据、清除浏览器数据或设备损坏可能导致丢失。建议每天营业结束后导出备份，安装更新前也先备份。</p></div>
+<h2>9. 本机数据异常怎么办</h2>
+<p>如果出现“本机数据暂时无法读取”，应用会保护原始数据并停止普通写入。先点击“导出故障数据”，确认文件已保存到应用之外。故障文件用于后续修复，不代表已经修复成功。重置会清除当前无法读取的数据，务必保存文件后再决定；有正常备份时可在重置后导入。</p>
+<h2>10. 更新与手势</h2>
+<p>新版 APK 应使用相同包名和签名覆盖安装。请勿先卸载旧版。安卓返回键优先关闭弹窗；未保存的配置和改签内容应先保存或明确放弃。所有滑动操作都保留按钮入口。</p>
+<p class="label">本说明为公开版 1.0 使用指南。具体价格、营业规则与须知，以棚主在应用中保存的配置为准。</p>
+</main></body></html>

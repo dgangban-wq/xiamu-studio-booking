@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+
+def signingPath = System.getenv('PUBLIC_ANDROID_KEYSTORE')
+def signingPassword = System.getenv('PUBLIC_ANDROID_STORE_PASSWORD')
+def signingAlias = System.getenv('PUBLIC_ANDROID_KEY_ALIAS')
+def signingKeyPassword = System.getenv('PUBLIC_ANDROID_KEY_PASSWORD')
+if (gradle.startParameter.taskNames.any { it.toLowerCase().contains('release') }) {
+    if (!signingPath || !signingPassword || !signingAlias || !signingKeyPassword) {
+        throw new GradleException('Public release requires explicit external signing environment.')
+    }
+    def key = new File(signingPath).canonicalFile
+    if (!key.isAbsolute() || !key.exists() || key.toPath().startsWith(rootDir.parentFile.canonicalFile.toPath())) {
+        throw new GradleException('Signing key must exist outside public-android source.')
+    }
+}
+android {
+    namespace 'com.studiobooking.publicapp'
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId 'com.studiobooking.publicapp'
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 2
+        versionName '1.0.1'
+    }
+    signingConfigs {
+        release {
+            if (signingPath) {
+                storeFile file(signingPath)
+                storePassword signingPassword
+                keyAlias signingAlias
+                keyPassword signingKeyPassword
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+repositories { flatDir { dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs' } }
+dependencies {
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    implementation project(':capacitor-cordova-android-plugins')
+}
+apply from: 'capacitor.build.gradle'

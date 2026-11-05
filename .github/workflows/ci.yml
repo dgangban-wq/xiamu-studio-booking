@@ -21,8 +21,12 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web-admin/package-lock.json
-      - name: Run core and offline tests
+      - name: Install public Android wrapper dependencies
+        run: npm ci --prefix public-android
+      - name: Run complete test suite
         run: node --test tests/*.test.js
+      - name: Sync public Android web assets
+        run: npm run sync:web --prefix public-android
       - name: Install Android wrapper dependencies
         run: npm ci --prefix android-app
       - name: Sync Android web assets
